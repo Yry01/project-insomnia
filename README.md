@@ -1,14 +1,54 @@
-Please use this repository for project files.
+# Chat Town
 
-- Do not publish your project code to a public repository.
-- You must only write your project proposal in this `README.md`
+## By team insomnia
 
-This README.md is to be replaced by your project proposal:
+Team members:
 
-- Project title and team name
-- Your focus (frontend focused or backend focused)
-- Team members with student numbers
-- Description of the web application
-- What complexity points will this project contain
-- (optional) What complexity points will be attempted as bonus for the challenge factor
-- What you aim to complete for the alpha version, beta version, and final version
+Haoming Hu: 1006763986
+
+Runyu Yue：1007391298
+
+Xu Zheng: 1006330132
+
+## Web application description
+
+Our web application is a virtual space that allows people to gather and interact with each other in a fun and engaging way. Our application is designed to recreate the experience of being in a physical space, with different areas, objects, and activities to explore.
+
+The main feature of our application is a customizable map where users can join different rooms or areas. Users can move around the map and interact with other users and objects in real-time, using avatars or customized characters.
+
+To enhance the social aspect of the application, we offer various communication features, such as private messaging, friend lists, or group chats. Users can also earn rewards or achievements by completing tasks or participating in events, which can be displayed on their profile page.
+
+Overall, our web application provides a unique and immersive way of connecting with people online, whether for entertainment, education, or collaboration. With its user-friendly interface, customizable features, and social capabilities, it offers a versatile and engaging platform for any kind of virtual gathering.
+
+
+## Complexity points picked
+
+1. socket io 2 points
+2. peerjs 2 points
+3. pixijs 2 points
+4. web audio 1 point
+5. sigin twillo 1 point
+6. google auth 1 point
+
+
+### Alpha version
+ - Main focus on pixi.js
+   - Create User character
+   - Character control
+   - Background Canvas 
+   - Animated moving
+
+### Beta version
+
+ - Signin twillo and google auth
+   - Account and Signin, Signup, Signout, authorize
+ - socket io
+   - Allow differenct user and real time synchronize
+ - Backend development
+
+
+### Final version
+ - perrjs
+   - User can text with other users
+ - web audio
+   - User can talk to other users
