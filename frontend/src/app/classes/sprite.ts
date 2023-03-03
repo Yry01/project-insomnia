@@ -25,6 +25,39 @@ export class Sprite {
       'stand-down': [
         new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 0 * 32, 32, 32)),
       ],
+      'stand-up': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 3 * 32, 32, 32)),
+      ],
+      'stand-left': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 2 * 32, 32, 32)),
+      ],
+      'stand-right': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 1 * 32, 32, 32)),
+      ],
+      'walk-down': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 0 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(1 * 32, 0 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(2 * 32, 0 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(3 * 32, 0 * 32, 32, 32)),
+      ],
+      'walk-up': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 3 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(1 * 32, 3 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(2 * 32, 3 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(3 * 32, 3 * 32, 32, 32)),
+      ],
+      'walk-left': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 2 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(1 * 32, 2 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(2 * 32, 2 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(3 * 32, 2 * 32, 32, 32)),
+      ],
+      'walk-right': [
+        new PIXI.Texture(sheet, new PIXI.Rectangle(0 * 32, 1 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(1 * 32, 1 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(2 * 32, 1 * 32, 32, 32)),
+        new PIXI.Texture(sheet, new PIXI.Rectangle(3 * 32, 1 * 32, 32, 32)),
+      ],
     };
   }
 
@@ -43,14 +76,32 @@ export class Sprite {
     this.playerSprite.play();
   }
 
-  removeFromStage() {
-    this.container.removeChild(this.playerSprite);
-  }
-
   update(state: any) {
     const x = this.playerObject.x;
     const y = this.playerObject.y;
 
+    if (state.direction !== undefined) {
+      this.playAnimation(state.direction);
+    }
+
     this.playerSprite.position.set(x, y);
+  }
+
+  private playAnimation(direction: string) {
+    if (!this.playerSprite.playing) {
+      this.playerObject.isPlayerMoving = true;
+      this.playerObject.direction = direction;
+      this.playerSprite.textures = this.animateSpriteSheet['walk-' + direction];
+      this.playerSprite.play();
+      this.playerSprite.onComplete = () => {
+        this.playerSprite.textures =
+          this.animateSpriteSheet['stand-' + direction];
+        this.playerObject.isPlayerMoving = false;
+      };
+    }
+  }
+
+  removeFromStage() {
+    this.container.removeChild(this.playerSprite);
   }
 }

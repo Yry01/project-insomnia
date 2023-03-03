@@ -5,6 +5,7 @@ export class Player {
   y: number;
   direction: string = 'down';
   isSpriteLoaded: boolean = false;
+  isPlayerMoving: boolean = false;
 
   private sprite: Sprite;
   private moveUpdate: { [key: string]: [number, number] } = {
@@ -56,6 +57,7 @@ export class Player {
   }
 
   private updatePosition(state: any) {
+    if (this.isPlayerMoving && state.direction !== this.direction) return;
     this.x = state.x;
     this.y = state.y;
   }
