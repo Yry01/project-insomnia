@@ -3,6 +3,7 @@ import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from '../../services/auth.service';
 import { UtilsService } from 'src/app/services/utils.service';
+import { Player } from '../../classes/player';
 import * as PIXI from 'pixi.js';
 
 @Component({
@@ -26,6 +27,28 @@ export class ChatTownComponent {
   // player objects
   playerId!: string;
   playerRef!: any;
+  allPlayersRef!: any;
+  allPlayers: { [key: string]: Player } = {};
+
+  // player skins
+  skins = [
+    '../assets/skins/davidmartinez.png',
+    '../assets/skins/dorio.png',
+    '../assets/skins/faraday.png',
+    '../assets/skins/johnny.png',
+    '../assets/skins/judy.png',
+    '../assets/skins/judyscuba.png',
+    '../assets/skins/kiwi.png',
+    '../assets/skins/lucy.png',
+    '../assets/skins/maine.png',
+    '../assets/skins/rebecca.png',
+    '../assets/skins/river.png',
+    '../assets/skins/riverjacket.png',
+    '../assets/skins/roguejacket.png',
+    '../assets/skins/takemura.png',
+    '../assets/skins/takemurajacket.png',
+    '../assets/skins/tbug.png',
+  ];
 
   constructor(
     private db: AngularFireDatabase,
@@ -42,7 +65,10 @@ export class ChatTownComponent {
         this.playerRef = this.db.database.ref(`players/${this.playerId}`);
         this.playerRef.set({
           id: this.playerId,
-          name: 'test',
+          skin: this.skins[Math.floor(Math.random() * 15)],
+          direction: 'down',
+          x: this.Utils.withGrid(0),
+          y: this.Utils.withGrid(0),
         });
 
         this.playerRef.onDisconnect().remove();
@@ -68,6 +94,9 @@ export class ChatTownComponent {
 
     // initialize the map
     this.initMap();
+
+    // initialize listeners on player movement
+    this.initListenersOnPlayerMovement();
   }
 
   initMap() {
@@ -88,5 +117,58 @@ export class ChatTownComponent {
 
     this.mapLowerContainer.addChild(mapLower);
     this.mapUpperContainer.addChild(mapUpper);
+  }
+
+  initListenersOnPlayerMovement() {
+    // real time player activities updates
+    const allPlayersRef = this.db.database.ref('players');
+
+    allPlayersRef.on('value', (snapshot: any) => {
+      this.allPlayersRef = snapshot.val();
+      Object.values(this.allPlayersRef).forEach((player: any) => {
+        this.loadOtherPlayers(player);
+      });
+    });
+
+    allPlayersRef.on('child_added', (snapshot: any) => {
+      const playerSnapshot = snapshot.val();
+
+      // add player to the game
+      let container =
+        playerSnapshot.id === this.playerId
+          ? this.mePlayerContainer
+          : this.otherPlayersContainer;
+
+      const newPlayer = new Player({
+        id: playerSnapshot.id,
+        x: playerSnapshot.x,
+        y: playerSnapshot.y,
+        skin: playerSnapshot.skin,
+        direction: playerSnapshot.direction,
+        container: container,
+      });
+
+      // add player to the list of all players (in memory)
+      this.allPlayers[playerSnapshot.id] = newPlayer;
+    });
+
+    allPlayersRef.on('child_removed', (snapshot: any) => {
+      const removedPlayer = snapshot.val();
+      this.allPlayers[removedPlayer.id].remove();
+      delete this.allPlayers[removedPlayer.id];
+    });
+  }
+
+  loadOtherPlayers(player: any) {
+    if (this.allPlayers[player.id].isSpriteLoaded === false) {
+      setTimeout(() => {
+        this.loadOtherPlayers(player);
+      }, 100);
+    } else {
+      this.allPlayers[player.id].update({
+        x: player.x,
+        y: player.y,
+      });
+    }
   }
 }
