@@ -4,6 +4,7 @@ import { AngularFireAuth } from '@angular/fire/compat/auth';
 import { AuthService } from '../../services/auth.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
+import { KeyPressListener } from 'src/app/classes/key-press-listener';
 import * as PIXI from 'pixi.js';
 
 @Component({
@@ -97,6 +98,9 @@ export class ChatTownComponent {
 
     // initialize listeners on player movement
     this.initListenersOnPlayerMovement();
+
+    // initialize keyboard controls
+    this.keyPressListener();
   }
 
   initMap() {
@@ -170,5 +174,24 @@ export class ChatTownComponent {
         y: player.y,
       });
     }
+  }
+
+  handleArrowPress(direction: string) {
+    if (true) {
+      //move to the next space
+      const mePlayer = this.allPlayers[this.playerId];
+      mePlayer.update({ direction: direction });
+      this.allPlayersRef[this.playerId].x = mePlayer.x;
+      this.allPlayersRef[this.playerId].y = mePlayer.y;
+      this.allPlayersRef[this.playerId].direction = mePlayer.direction;
+      this.playerRef.set(this.allPlayersRef[this.playerId]);
+    }
+  }
+
+  keyPressListener() {
+    new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
+    new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
+    new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
+    new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
   }
 }
