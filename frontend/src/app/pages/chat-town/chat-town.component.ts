@@ -68,8 +68,8 @@ export class ChatTownComponent {
           id: this.playerId,
           skin: this.skins[Math.floor(Math.random() * 15)],
           direction: 'down',
-          x: this.Utils.withGrid(0),
-          y: this.Utils.withGrid(0),
+          x: this.Utils.withGrid(38),
+          y: this.Utils.withGrid(14),
         });
 
         this.playerRef.onDisconnect().remove();
@@ -118,6 +118,16 @@ export class ChatTownComponent {
     // initialize the game map
     const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png');
     const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png');
+
+    // set the spawn point of the map
+    this.mapLowerContainer.position.set(
+      this.Utils.xOffSet() - this.Utils.withGrid(38),
+      this.Utils.yOffSet() - this.Utils.withGrid(14)
+    );
+    this.mapUpperContainer.position.set(
+      this.Utils.xOffSet() - this.Utils.withGrid(38),
+      this.Utils.yOffSet() - this.Utils.withGrid(14)
+    );
 
     this.mapLowerContainer.addChild(mapLower);
     this.mapUpperContainer.addChild(mapUpper);
@@ -172,6 +182,7 @@ export class ChatTownComponent {
       this.allPlayers[player.id].update({
         x: player.x,
         y: player.y,
+        cameraPerson: this.allPlayersRef[this.playerId],
       });
     }
   }
@@ -180,12 +191,26 @@ export class ChatTownComponent {
     if (true) {
       //move to the next space
       const mePlayer = this.allPlayers[this.playerId];
-      mePlayer.update({ direction: direction });
+      mePlayer.update({
+        direction: direction,
+        cameraPerson: this.allPlayersRef[this.playerId],
+      });
       this.allPlayersRef[this.playerId].x = mePlayer.x;
       this.allPlayersRef[this.playerId].y = mePlayer.y;
       this.allPlayersRef[this.playerId].direction = mePlayer.direction;
       this.playerRef.set(this.allPlayersRef[this.playerId]);
     }
+
+    // update map position
+    const cameraPerson = this.allPlayersRef[this.playerId];
+    this.mapLowerContainer.position.set(
+      this.Utils.xOffSet() - cameraPerson.x,
+      this.Utils.yOffSet() - cameraPerson.y
+    );
+    this.mapUpperContainer.position.set(
+      this.Utils.xOffSet() - cameraPerson.x,
+      this.Utils.yOffSet() - cameraPerson.y
+    );
   }
 
   keyPressListener() {

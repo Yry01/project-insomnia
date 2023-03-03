@@ -1,4 +1,5 @@
 import { Player } from './player';
+import { UtilsService } from '../services/utils.service';
 import * as PIXI from 'pixi.js';
 
 export class Sprite {
@@ -7,6 +8,7 @@ export class Sprite {
   private animateSpriteSheet: any;
   private container: PIXI.Container;
   private playerObject: Player;
+  private Utils: UtilsService = new UtilsService();
 
   constructor(config: any) {
     this.container = config.container;
@@ -77,8 +79,8 @@ export class Sprite {
   }
 
   update(state: any) {
-    const x = this.playerObject.x;
-    const y = this.playerObject.y;
+    const x = this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
+    const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
 
     if (state.direction !== undefined) {
       this.playAnimation(state.direction);
