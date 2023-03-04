@@ -20,7 +20,6 @@ To enhance the social aspect of the application, we offer various communication 
 
 Overall, our web application provides a unique and immersive way of connecting with people online, whether for entertainment, education, or collaboration. With its user-friendly interface, customizable features, and social capabilities, it offers a versatile and engaging platform for any kind of virtual gathering.
 
-
 ## Complexity points picked
 
 1. socket io 2 points
@@ -30,25 +29,25 @@ Overall, our web application provides a unique and immersive way of connecting w
 5. sigin twillo 1 point
 6. google auth 1 point
 
-
 ### Alpha version
- - Main focus on pixi.js
-   - Create User character
-   - Character control
-   - Background Canvas 
-   - Animated moving
+
+- Main focus on pixi.js
+  - Create User character
+  - Character control
+  - Background Canvas
+  - Animated moving
 
 ### Beta version
 
- - Signin twillo and google auth
-   - Account and Signin, Signup, Signout, authorize
- - socket io
-   - Allow differenct user and real time synchronize
- - Backend development
-
+- Signin twillo and google auth
+  - Account and Signin, Signup, Signout, authorize
+- socket io
+  - Allow differenct user and real time synchronize
+- Backend development
 
 ### Final version
- - perrjs
-   - User can text with other users
- - web audio
-   - User can talk to other users
+
+- perrjs
+  - User can text with other users
+- web audio
+  - User can talk to other users
