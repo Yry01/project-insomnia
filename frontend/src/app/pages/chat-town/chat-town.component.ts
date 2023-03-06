@@ -67,7 +67,7 @@ export class ChatTownComponent {
           id: this.playerId,
           skin: this.skins[Math.floor(Math.random() * 15)],
           direction: 'down',
-          x: this.Utils.withGrid(39),
+          x: this.Utils.withGrid(24),
           y: this.Utils.withGrid(22),
         });
 
@@ -119,11 +119,11 @@ export class ChatTownComponent {
 
     // set the spawn point of the map
     this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(39),
+      this.Utils.xOffSet() - this.Utils.withGrid(24),
       this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
     this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(39),
+      this.Utils.xOffSet() - this.Utils.withGrid(24),
       this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
 
@@ -196,14 +196,16 @@ export class ChatTownComponent {
 
     // update map position
     const cameraPerson = this.allPlayersRef[this.playerId];
-    this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - cameraPerson.x,
-      this.Utils.yOffSet() - cameraPerson.y
-    );
-    this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - cameraPerson.x,
-      this.Utils.yOffSet() - cameraPerson.y
-    );
+    if(cameraPerson.x>152&&cameraPerson.x<472){
+      this.mapLowerContainer.position.set(
+        this.Utils.xOffSet() - cameraPerson.x,
+        this.Utils.yOffSet() - cameraPerson.y
+      );
+      this.mapUpperContainer.position.set(
+        this.Utils.xOffSet() - cameraPerson.x,
+        this.Utils.yOffSet() - cameraPerson.y
+      );
+    }
   }
 
   keyPressListener() {

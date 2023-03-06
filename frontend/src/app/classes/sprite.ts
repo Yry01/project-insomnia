@@ -78,16 +78,34 @@ export class Sprite {
   }
 
   update(state: any) {
-    const x = this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
-    const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
+    console.log(state.cameraPerson.x, state.cameraPerson.y, this.playerObject.x, this.playerObject.y)
+    //if camera person has distance from the wall less than 15, then the whole map should not move according to the player\
+    if(state.cameraPerson.x < 472&&state.cameraPerson.x>152) {
+      const x = this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
+      const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
 
-    if (state.direction !== undefined) {
-      this.playAnimation(state.direction);
+      if (state.direction !== undefined) {
+        this.playAnimation(state.direction);
+      }
+
+      this.playerSprite.zIndex = y;
+      this.playerSprite.position.set(x - 8, y - 16);
     }
-
-    this.playerSprite.zIndex = y;
-    this.playerSprite.position.set(x - 8, y - 16);
+    else {
+      if(state.cameraPerson.x === this.playerObject.x&& state.cameraPerson.y === this.playerObject.y) {
+        if(state.cameraPerson.x>472) {
+          const x = this.playerObject.x + this.Utils.xOffSet() - 472;
+          const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
+          if (state.direction !== undefined) {
+            this.playAnimation(state.direction);
+          }
+          this.playerSprite.zIndex = y;
+          this.playerSprite.position.set(x - 8, y - 16);
+        }
+      }
+    }
   }
+
 
   private playAnimation(direction: string) {
     if (!this.playerSprite.playing) {
