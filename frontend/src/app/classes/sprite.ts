@@ -89,7 +89,7 @@ export class Sprite {
     this.playerSprite.position.set(x - 8, y - 16);
   }
 
-  private playAnimation(direction: string) {
+  playAnimation(direction: string) {
     if (!this.playerSprite.playing) {
       this.playerObject.isPlayerMoving = true;
       this.playerObject.direction = direction;

@@ -195,6 +195,8 @@ export class ChatTownComponent {
       this.allPlayersRef[this.playerId].y = mePlayer.y;
       this.allPlayersRef[this.playerId].direction = mePlayer.direction;
       this.playerRef.set(this.allPlayersRef[this.playerId]);
+    } else {
+      mePlayer.playAnimation(direction);
     }
 
     // update map position

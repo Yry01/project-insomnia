@@ -9,10 +9,10 @@ export class Player {
 
   private sprite: Sprite;
   private moveUpdate: { [key: string]: [number, number] } = {
-    up: [0, -4],
-    down: [0, 4],
-    left: [-4, 0],
-    right: [4, 0],
+    up: [0, -16],
+    down: [0, 16],
+    left: [-16, 0],
+    right: [16, 0],
   };
 
   constructor(config: any) {
@@ -64,6 +64,10 @@ export class Player {
 
   private updateSprite(state: any) {
     this.sprite.update(state);
+  }
+
+  playAnimation(direction: string) {
+    this.sprite.playAnimation(direction);
   }
 
   remove() {
