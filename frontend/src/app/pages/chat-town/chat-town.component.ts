@@ -13,9 +13,9 @@ import * as PIXI from 'pixi.js';
   styleUrls: ['./chat-town.component.scss'],
 })
 export class ChatTownComponent {
-  // map info
-  WIDTH = 960;
-  HEIGHT = 720;
+  // canvas info
+  WIDTH = 480;
+  HEIGHT = 320;
   BG_COLOR = 0xd9f4ff;
   app!: PIXI.Application;
 
@@ -68,8 +68,8 @@ export class ChatTownComponent {
           id: this.playerId,
           skin: this.skins[Math.floor(Math.random() * 15)],
           direction: 'down',
-          x: this.Utils.withGrid(38),
-          y: this.Utils.withGrid(14),
+          x: this.Utils.withGrid(0),
+          y: this.Utils.withGrid(0),
         });
 
         this.playerRef.onDisconnect().remove();
@@ -116,17 +116,17 @@ export class ChatTownComponent {
     this.app.stage.addChild(this.mapUpperContainer);
 
     // initialize the game map
-    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png');
-    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png');
+    const mapLower = PIXI.Sprite.from('../../assets/map/map.png'); // change
+    const mapUpper = PIXI.Sprite.from('../../assets/map/map.png'); // change
 
     // set the spawn point of the map
     this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(38),
-      this.Utils.yOffSet() - this.Utils.withGrid(14)
+      this.Utils.xOffSet() - this.Utils.withGrid(0),
+      this.Utils.yOffSet() - this.Utils.withGrid(0)
     );
     this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(38),
-      this.Utils.yOffSet() - this.Utils.withGrid(14)
+      this.Utils.xOffSet() - this.Utils.withGrid(0),
+      this.Utils.yOffSet() - this.Utils.withGrid(0)
     );
 
     this.mapLowerContainer.addChild(mapLower);

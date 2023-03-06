@@ -71,7 +71,6 @@ export class Sprite {
     this.playerSprite.loop = false;
     this.playerSprite.x = config.x;
     this.playerSprite.y = config.y;
-    this.playerSprite.scale.set(2);
     texture.baseTexture.scaleMode = PIXI.SCALE_MODES.NEAREST;
     this.playerObject.isSpriteLoaded = true;
     this.container.addChild(this.playerSprite);
