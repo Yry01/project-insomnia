@@ -196,7 +196,12 @@ export class ChatTownComponent {
 
     // update map position
     const cameraPerson = this.allPlayersRef[this.playerId];
-    if(cameraPerson.x>152&&cameraPerson.x<472){
+    if (
+      cameraPerson.x > 156 &&
+      cameraPerson.x < 392 &&
+      cameraPerson.y > 136 &&
+      cameraPerson.y < 436
+    ) {
       this.mapLowerContainer.position.set(
         this.Utils.xOffSet() - cameraPerson.x,
         this.Utils.yOffSet() - cameraPerson.y
@@ -205,7 +210,56 @@ export class ChatTownComponent {
         this.Utils.xOffSet() - cameraPerson.x,
         this.Utils.yOffSet() - cameraPerson.y
       );
+    } else {
+      let xOffSet = this.Utils.xOffSet();
+      let yOffSet = this.Utils.yOffSet();
+      if (cameraPerson.x < 156) {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - 156;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 436) {
+          xOffSet = xOffSet - 156;
+          yOffSet = yOffSet - 436;
+        } else {
+          xOffSet = xOffSet - 156;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      } else if (cameraPerson.x > 392) {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 436) {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - 436;
+        } else {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      } else {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 436) {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - 436;
+        } else {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      }
+      this.mapLowerContainer.position.set(xOffSet, yOffSet);
+      this.mapUpperContainer.position.set(xOffSet, yOffSet);
     }
+    // if (cameraPerson.y>136&&cameraPerson.y<436){
+    //   this.mapLowerContainer.position.set(
+    //     this.Utils.xOffSet() - cameraPerson.x,
+    //     this.Utils.yOffSet() - cameraPerson.y
+    //   );
+    //   this.mapUpperContainer.position.set(
+    //     this.Utils.xOffSet() - cameraPerson.x,
+    //     this.Utils.yOffSet() - cameraPerson.y
+    //   );
+    // }
   }
 
   keyPressListener() {

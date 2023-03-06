@@ -78,34 +78,63 @@ export class Sprite {
   }
 
   update(state: any) {
-    console.log(state.cameraPerson.x, state.cameraPerson.y, this.playerObject.x, this.playerObject.y)
+    console.log(
+      state.cameraPerson.x,
+      state.cameraPerson.y,
+      this.playerObject.x,
+      this.playerObject.y
+    );
     //if camera person has distance from the wall less than 15, then the whole map should not move according to the player\
-    if(state.cameraPerson.x < 472&&state.cameraPerson.x>152) {
-      const x = this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
-      const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
-
+    if (
+      state.cameraPerson.x === this.playerObject.x &&
+      state.cameraPerson.y === this.playerObject.y
+    ) {
+      let y = this.Utils.yOffSet();
+      let x = this.Utils.xOffSet();
+      if (state.cameraPerson.y > 436) {
+        y = this.playerObject.y + this.Utils.yOffSet() - 436;
+        if (state.cameraPerson.x > 392) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 392;
+        } else if (state.cameraPerson.x < 156) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        }
+      } else if (state.cameraPerson.y < 136) {
+        y = this.playerObject.y + this.Utils.yOffSet() - 136;
+        if (state.cameraPerson.x > 392) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 392;
+        } else if (state.cameraPerson.x < 156) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        }
+      } else {
+        if (state.cameraPerson.x > 392) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 392;
+        } else if (state.cameraPerson.x < 156) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        }
+      }
+      // else if(state.cameraPerson.x>392) {
+      //   x = this.playerObject.x + this.Utils.xOffSet() - 392;
+      // }
+      // else if(state.cameraPerson.x<156) {
+      //   x = this.playerObject.x + this.Utils.xOffSet() - 156;
+      // }
       if (state.direction !== undefined) {
         this.playAnimation(state.direction);
       }
-
+      this.playerSprite.zIndex = y;
+      this.playerSprite.position.set(x - 8, y - 16);
+    } else {
+      const x =
+        this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
+      const y =
+        this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
+      if (state.direction !== undefined) {
+        this.playAnimation(state.direction);
+      }
       this.playerSprite.zIndex = y;
       this.playerSprite.position.set(x - 8, y - 16);
     }
-    else {
-      if(state.cameraPerson.x === this.playerObject.x&& state.cameraPerson.y === this.playerObject.y) {
-        if(state.cameraPerson.x>472) {
-          const x = this.playerObject.x + this.Utils.xOffSet() - 472;
-          const y = this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
-          if (state.direction !== undefined) {
-            this.playAnimation(state.direction);
-          }
-          this.playerSprite.zIndex = y;
-          this.playerSprite.position.set(x - 8, y - 16);
-        }
-      }
-    }
   }
-
 
   private playAnimation(direction: string) {
     if (!this.playerSprite.playing) {
