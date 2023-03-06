@@ -78,9 +78,9 @@ for (let i = 368; i < 416; i += 4) {
   }
 }
 
-// coffee machine, coner points (436, 72), (439, 96), (464, 96), (464, 72)
-for (let i = 436; i < 464; i += 4) {
-  for (let j = 72; j < 96; j += 4) {
+// coffee machine, coner points (436, 68), (439, 96), (480, 96), (480, 68)
+for (let i = 436; i < 480; i += 4) {
+  for (let j = 68; j < 96; j += 4) {
     collisions.push([i, j].toString());
   }
 }
@@ -88,6 +88,62 @@ for (let i = 436; i < 464; i += 4) {
 // left table coffee machine, coner points (368, 64), (368, 92), (416, 92), (416, 64)
 for (let i = 368; i < 416; i += 4) {
   for (let j = 64; j < 92; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// table before coffee machine, coner points (404, 32), (404, 48), (464, 48), (464, 32)
+for (let i = 404; i < 464; i += 4) {
+  for (let j = 32; j < 48; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// trunk, coner points (452, 32), (452, 64), (480, 64), (480, 32)
+for (let i = 452; i < 480; i += 4) {
+  for (let j = 32; j < 64; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// dining room food place and wall, coner points (16, 176), (16, 208), (208, 208), (208, 176)
+for (let i = 16; i < 208; i += 4) {
+  for (let j = 176; j < 208; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+//dinning room right wall, coner points (164, 208), (164, 272), (208, 272), (208, 208)
+for (let i = 164; i < 208; i += 4) {
+  for (let j = 208; j < 272; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// dinning room left bot wall, coner points (16, 272), (16, 304), (80, 304), (80, 272)
+for (let i = 16; i < 80; i += 4) {
+  for (let j = 272; j < 304; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// dinning room right bot wall, coner points (100, 272), (100, 304), (304, 304), (304, 272)
+for (let i = 100; i < 304; i += 4) {
+  for (let j = 272; j < 304; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// dinning room table 1, coner points (24, 224), (24, 256), (48, 256), (48, 224)
+for (let i = 24; i < 48; i += 4) {
+  for (let j = 224; j < 256; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// dinning room table 2, coner points (132, 224), (132, 256), (160, 256), (160, 224)
+for (let i = 132; i < 160; i += 4) {
+  for (let j = 224; j < 256; j += 4) {
     collisions.push([i, j].toString());
   }
 }
