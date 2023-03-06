@@ -85,6 +85,7 @@ export class Sprite {
       this.playAnimation(state.direction);
     }
 
+    this.playerSprite.zIndex = y;
     this.playerSprite.position.set(x - 8, y - 16);
   }
 

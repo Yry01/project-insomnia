@@ -22,8 +22,7 @@ export class ChatTownComponent {
   // map layers
   mapLowerContainer!: PIXI.Container;
   mapUpperContainer!: PIXI.Container;
-  otherPlayersContainer!: PIXI.Container;
-  mePlayerContainer!: PIXI.Container;
+  playersContainer!: PIXI.Container;
 
   // player objects
   playerId!: string;
@@ -107,12 +106,11 @@ export class ChatTownComponent {
     // initialize different layers of the game
     this.mapLowerContainer = new PIXI.Container();
     this.mapUpperContainer = new PIXI.Container();
-    this.otherPlayersContainer = new PIXI.Container();
-    this.mePlayerContainer = new PIXI.Container();
+    this.playersContainer = new PIXI.Container();
+    this.playersContainer.sortableChildren = true;
 
     this.app.stage.addChild(this.mapLowerContainer);
-    this.app.stage.addChild(this.otherPlayersContainer);
-    this.app.stage.addChild(this.mePlayerContainer);
+    this.app.stage.addChild(this.playersContainer);
     this.app.stage.addChild(this.mapUpperContainer);
 
     // initialize the game map
@@ -148,18 +146,13 @@ export class ChatTownComponent {
       const playerSnapshot = snapshot.val();
 
       // add player to the game
-      let container =
-        playerSnapshot.id === this.playerId
-          ? this.mePlayerContainer
-          : this.otherPlayersContainer;
-
       const newPlayer = new Player({
         id: playerSnapshot.id,
         x: playerSnapshot.x,
         y: playerSnapshot.y,
         skin: playerSnapshot.skin,
         direction: playerSnapshot.direction,
-        container: container,
+        container: this.playersContainer,
       });
 
       // add player to the list of all players (in memory)
