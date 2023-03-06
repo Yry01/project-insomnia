@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Player } from '../classes/player';
-import { COLLISIONS } from '../constants/constant';
+import { COLLISIONS } from '../constants/collisions-constant';
 
 @Injectable({
   providedIn: 'root',
