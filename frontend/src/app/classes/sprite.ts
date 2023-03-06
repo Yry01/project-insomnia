@@ -85,7 +85,7 @@ export class Sprite {
       this.playAnimation(state.direction);
     }
 
-    this.playerSprite.position.set(x, y);
+    this.playerSprite.position.set(x - 8, y - 16);
   }
 
   private playAnimation(direction: string) {

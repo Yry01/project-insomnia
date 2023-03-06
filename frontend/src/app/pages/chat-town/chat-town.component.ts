@@ -68,8 +68,8 @@ export class ChatTownComponent {
           id: this.playerId,
           skin: this.skins[Math.floor(Math.random() * 15)],
           direction: 'down',
-          x: this.Utils.withGrid(0),
-          y: this.Utils.withGrid(0),
+          x: this.Utils.withGrid(39),
+          y: this.Utils.withGrid(22),
         });
 
         this.playerRef.onDisconnect().remove();
@@ -116,17 +116,17 @@ export class ChatTownComponent {
     this.app.stage.addChild(this.mapUpperContainer);
 
     // initialize the game map
-    const mapLower = PIXI.Sprite.from('../../assets/map/map.png'); // change
-    const mapUpper = PIXI.Sprite.from('../../assets/map/map.png'); // change
+    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png'); // change
+    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png'); // change
 
     // set the spawn point of the map
     this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(0),
-      this.Utils.yOffSet() - this.Utils.withGrid(0)
+      this.Utils.xOffSet() - this.Utils.withGrid(39),
+      this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
     this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(0),
-      this.Utils.yOffSet() - this.Utils.withGrid(0)
+      this.Utils.xOffSet() - this.Utils.withGrid(39),
+      this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
 
     this.mapLowerContainer.addChild(mapLower);

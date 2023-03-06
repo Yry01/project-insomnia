@@ -15,6 +15,6 @@ export class UtilsService {
   }
 
   yOffSet(): number {
-    return 9.5 * 16;
+    return 8.5 * 16;
   }
 }
