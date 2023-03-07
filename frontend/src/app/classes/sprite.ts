@@ -78,12 +78,6 @@ export class Sprite {
   }
 
   update(state: any) {
-    console.log(
-      state.cameraPerson.x,
-      state.cameraPerson.y,
-      this.playerObject.x,
-      this.playerObject.y
-    );
     //if camera person has distance from the wall less than 15, then the whole map should not move according to the player\
     if (
       state.cameraPerson.x === this.playerObject.x &&
