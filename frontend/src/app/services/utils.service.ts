@@ -7,14 +7,14 @@ export class UtilsService {
   constructor() {}
 
   withGrid(n: number): number {
-    return n * 32;
+    return n * 16;
   }
 
   xOffSet(): number {
-    return 13.5 * 32;
+    return 14.5 * 16;
   }
 
   yOffSet(): number {
-    return 10.75 * 32;
+    return 8.5 * 16;
   }
 }

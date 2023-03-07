@@ -6,6 +6,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
 import { KeyPressListener } from 'src/app/classes/key-press-listener';
 import * as PIXI from 'pixi.js';
+import { CollisionsService } from '../../services/collisions.service';
 
 @Component({
   selector: 'app-chat-town',
@@ -13,17 +14,16 @@ import * as PIXI from 'pixi.js';
   styleUrls: ['./chat-town.component.scss'],
 })
 export class ChatTownComponent {
-  // map info
-  WIDTH = 960;
-  HEIGHT = 720;
+  // canvas info
+  WIDTH = 480;
+  HEIGHT = 320;
   BG_COLOR = 0xd9f4ff;
   app!: PIXI.Application;
 
   // map layers
   mapLowerContainer!: PIXI.Container;
   mapUpperContainer!: PIXI.Container;
-  otherPlayersContainer!: PIXI.Container;
-  mePlayerContainer!: PIXI.Container;
+  playersContainer!: PIXI.Container;
 
   // player objects
   playerId!: string;
@@ -55,7 +55,8 @@ export class ChatTownComponent {
     private db: AngularFireDatabase,
     private afAuth: AngularFireAuth,
     private authService: AuthService,
-    private Utils: UtilsService
+    private Utils: UtilsService,
+    private Collisions: CollisionsService
   ) {}
 
   ngOnInit(): void {
@@ -68,8 +69,8 @@ export class ChatTownComponent {
           id: this.playerId,
           skin: this.skins[Math.floor(Math.random() * 15)],
           direction: 'down',
-          x: this.Utils.withGrid(38),
-          y: this.Utils.withGrid(14),
+          x: this.Utils.withGrid(24),
+          y: this.Utils.withGrid(22),
         });
 
         this.playerRef.onDisconnect().remove();
@@ -107,26 +108,25 @@ export class ChatTownComponent {
     // initialize different layers of the game
     this.mapLowerContainer = new PIXI.Container();
     this.mapUpperContainer = new PIXI.Container();
-    this.otherPlayersContainer = new PIXI.Container();
-    this.mePlayerContainer = new PIXI.Container();
+    this.playersContainer = new PIXI.Container();
+    this.playersContainer.sortableChildren = true;
 
     this.app.stage.addChild(this.mapLowerContainer);
-    this.app.stage.addChild(this.otherPlayersContainer);
-    this.app.stage.addChild(this.mePlayerContainer);
+    this.app.stage.addChild(this.playersContainer);
     this.app.stage.addChild(this.mapUpperContainer);
 
     // initialize the game map
-    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png');
-    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png');
+    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png'); // change
+    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png'); // change
 
     // set the spawn point of the map
     this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(38),
-      this.Utils.yOffSet() - this.Utils.withGrid(14)
+      this.Utils.xOffSet() - this.Utils.withGrid(24),
+      this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
     this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - this.Utils.withGrid(38),
-      this.Utils.yOffSet() - this.Utils.withGrid(14)
+      this.Utils.xOffSet() - this.Utils.withGrid(24),
+      this.Utils.yOffSet() - this.Utils.withGrid(22)
     );
 
     this.mapLowerContainer.addChild(mapLower);
@@ -148,18 +148,13 @@ export class ChatTownComponent {
       const playerSnapshot = snapshot.val();
 
       // add player to the game
-      let container =
-        playerSnapshot.id === this.playerId
-          ? this.mePlayerContainer
-          : this.otherPlayersContainer;
-
       const newPlayer = new Player({
         id: playerSnapshot.id,
         x: playerSnapshot.x,
         y: playerSnapshot.y,
         skin: playerSnapshot.skin,
         direction: playerSnapshot.direction,
-        container: container,
+        container: this.playersContainer,
       });
 
       // add player to the list of all players (in memory)
@@ -188,9 +183,9 @@ export class ChatTownComponent {
   }
 
   handleArrowPress(direction: string) {
-    if (true) {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
       //move to the next space
-      const mePlayer = this.allPlayers[this.playerId];
       mePlayer.update({
         direction: direction,
         cameraPerson: this.allPlayersRef[this.playerId],
@@ -199,18 +194,76 @@ export class ChatTownComponent {
       this.allPlayersRef[this.playerId].y = mePlayer.y;
       this.allPlayersRef[this.playerId].direction = mePlayer.direction;
       this.playerRef.set(this.allPlayersRef[this.playerId]);
+    } else {
+      mePlayer.playAnimation(direction);
     }
 
     // update map position
     const cameraPerson = this.allPlayersRef[this.playerId];
-    this.mapLowerContainer.position.set(
-      this.Utils.xOffSet() - cameraPerson.x,
-      this.Utils.yOffSet() - cameraPerson.y
-    );
-    this.mapUpperContainer.position.set(
-      this.Utils.xOffSet() - cameraPerson.x,
-      this.Utils.yOffSet() - cameraPerson.y
-    );
+    if (
+      cameraPerson.x > 232 &&
+      cameraPerson.x < 392 &&
+      cameraPerson.y > 136 &&
+      cameraPerson.y < 396
+    ) {
+      this.mapLowerContainer.position.set(
+        this.Utils.xOffSet() - cameraPerson.x,
+        this.Utils.yOffSet() - cameraPerson.y
+      );
+      this.mapUpperContainer.position.set(
+        this.Utils.xOffSet() - cameraPerson.x,
+        this.Utils.yOffSet() - cameraPerson.y
+      );
+    } else {
+      let xOffSet = this.Utils.xOffSet();
+      let yOffSet = this.Utils.yOffSet();
+      if (cameraPerson.x < 232) {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - 232;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 396) {
+          xOffSet = xOffSet - 232;
+          yOffSet = yOffSet - 396;
+        } else {
+          xOffSet = xOffSet - 232;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      } else if (cameraPerson.x > 392) {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 396) {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - 396;
+        } else {
+          xOffSet = xOffSet - 392;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      } else {
+        if (cameraPerson.y < 136) {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - 136;
+        } else if (cameraPerson.y > 396) {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - 396;
+        } else {
+          xOffSet = xOffSet - cameraPerson.x;
+          yOffSet = yOffSet - cameraPerson.y;
+        }
+      }
+      this.mapLowerContainer.position.set(xOffSet, yOffSet);
+      this.mapUpperContainer.position.set(xOffSet, yOffSet);
+    }
+    // if (cameraPerson.y>136&&cameraPerson.y<436){
+    //   this.mapLowerContainer.position.set(
+    //     this.Utils.xOffSet() - cameraPerson.x,
+    //     this.Utils.yOffSet() - cameraPerson.y
+    //   );
+    //   this.mapUpperContainer.position.set(
+    //     this.Utils.xOffSet() - cameraPerson.x,
+    //     this.Utils.yOffSet() - cameraPerson.y
+    //   );
+    // }
   }
 
   keyPressListener() {

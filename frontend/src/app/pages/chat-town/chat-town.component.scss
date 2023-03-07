@@ -1,9 +1,9 @@
 #game-container {
   position: relative;
-  margin: 0 auto;
-  width: 960px;
-  height: 720px;
-  transform: translateY(10%);
+  margin: auto;
+  width: 480px;
+  height: 320px;
+  transform: scale(3) translateY(50%);
 }
 
 #game-container canvas {
