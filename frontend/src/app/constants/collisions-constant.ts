@@ -148,4 +148,67 @@ for (let i = 132; i < 160; i += 4) {
   }
 }
 
+// left coner list, coner points (16, 320), (16, 368), (48, 368), (48, 320)
+for (let i = 16; i < 48; i += 4) {
+  for (let j = 320; j < 368; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// left coner list 2, coner points (52, 320), (52, 368), (96, 368), (96, 320)
+for (let i = 52; i < 96; i += 4) {
+  for (let j = 320; j < 368; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// left coner table 1, coner points (116, 320),  (116, 352), (176, 352), (176, 320)
+for (let i = 116; i < 176; i += 4) {
+  for (let j = 320; j < 352; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// left coner table 2, coner points (180, 320), (180, 352), (240, 352), (240, 320)
+for (let i = 180; i < 240; i += 4) {
+  for (let j = 320; j < 352; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// wall after table 2, coner points (260, 304), (260, 320), (288, 320), (288, 304)
+for (let i = 260; i < 288; i += 4) {
+  for (let j = 304; j < 320; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// wall after table 2, coner points (260, 352), (260, 384), (288, 384), (288, 352)
+for (let i = 260; i < 288; i += 4) {
+  for (let j = 352; j < 384; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+//wall with fire, coner points (324, 272), (324, 304), (448, 304), (448, 272)
+for (let i = 324; i < 448; i += 4) {
+  for (let j = 272; j < 304; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// right wall of camera room, coner points (340, 176), (340, 272), (368, 272), (368, 176)
+for (let i = 340; i < 368; i += 4) {
+  for (let j = 176; j < 272; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// table in camera room, coner points (228, 176), (228, 208), (320, 208), (320, 176)
+for (let i = 228; i < 320; i += 4) {
+  for (let j = 176; j < 208; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
 export const COLLISIONS = collisions;
