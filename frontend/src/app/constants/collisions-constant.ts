@@ -211,4 +211,25 @@ for (let i = 228; i < 320; i += 4) {
   }
 }
 
+// camera 1, coner points (228, 224), (228, 256), (256, 256), (256, 224)
+for (let i = 228; i < 256; i += 4) {
+  for (let j = 224; j < 256; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// camera 2, coner points (260, 224), (260, 256), (288, 256), (288, 224)
+for (let i = 260; i < 288; i += 4) {
+  for (let j = 224; j < 256; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// camera 2, coner points (292, 224), (292, 256), (320, 256), (320, 224)
+for (let i = 292; i < 320; i += 4) {
+  for (let j = 224; j < 256; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
 export const COLLISIONS = collisions;

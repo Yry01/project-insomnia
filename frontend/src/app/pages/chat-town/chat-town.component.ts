@@ -184,7 +184,6 @@ export class ChatTownComponent {
 
   handleArrowPress(direction: string) {
     const mePlayer = this.allPlayers[this.playerId];
-    console.log(mePlayer.x, mePlayer.y);
     if (!this.Collisions.checkCollisions(mePlayer, direction)) {
       //move to the next space
       mePlayer.update({
