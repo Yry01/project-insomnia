@@ -232,4 +232,25 @@ for (let i = 292; i < 320; i += 4) {
   }
 }
 
+// camear 4, coner points (324, 244), (324, 272), (352, 272), (352, 244)
+for (let i = 324; i < 352; i += 4) {
+  for (let j = 244; j < 272; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// camera 5, coner points (324, 176), (324, 208), (352, 208), (352, 176)
+for (let i = 324; i < 352; i += 4) {
+  for (let j = 176; j < 208; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
+// camera 6, coner points (208, 176), (208, 208), (224, 208), (224, 176)
+for (let i = 208; i < 224; i += 4) {
+  for (let j = 176; j < 208; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
 export const COLLISIONS = collisions;
