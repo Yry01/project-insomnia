@@ -6,6 +6,7 @@ import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
 import { KeyPressListener } from 'src/app/classes/key-press-listener';
 import * as PIXI from 'pixi.js';
+import { CollisionsService } from '../../services/collisions.service';
 
 @Component({
   selector: 'app-chat-town',
@@ -54,7 +55,8 @@ export class ChatTownComponent {
     private db: AngularFireDatabase,
     private afAuth: AngularFireAuth,
     private authService: AuthService,
-    private Utils: UtilsService
+    private Utils: UtilsService,
+    private Collisions: CollisionsService
   ) {}
 
   ngOnInit(): void {
@@ -181,9 +183,9 @@ export class ChatTownComponent {
   }
 
   handleArrowPress(direction: string) {
-    if (true) {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
       //move to the next space
-      const mePlayer = this.allPlayers[this.playerId];
       mePlayer.update({
         direction: direction,
         cameraPerson: this.allPlayersRef[this.playerId],
@@ -192,6 +194,8 @@ export class ChatTownComponent {
       this.allPlayersRef[this.playerId].y = mePlayer.y;
       this.allPlayersRef[this.playerId].direction = mePlayer.direction;
       this.playerRef.set(this.allPlayersRef[this.playerId]);
+    } else {
+      mePlayer.playAnimation(direction);
     }
 
     // update map position

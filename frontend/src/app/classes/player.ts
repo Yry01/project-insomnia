@@ -66,6 +66,10 @@ export class Player {
     this.sprite.update(state);
   }
 
+  playAnimation(direction: string) {
+    this.sprite.playAnimation(direction);
+  }
+
   remove() {
     this.sprite.removeFromStage();
   }

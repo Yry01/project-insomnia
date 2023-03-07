@@ -166,7 +166,7 @@ export class Sprite {
     }
   }
 
-  private playAnimation(direction: string) {
+  playAnimation(direction: string) {
     if (!this.playerSprite.playing) {
       this.playerObject.isPlayerMoving = true;
       this.playerObject.direction = direction;
