@@ -253,4 +253,11 @@ for (let i = 208; i < 224; i += 4) {
   }
 }
 
+// christmas trees, coner points (580, 304), (580, 336), (640, 336), (640, 304)
+for (let i = 580; i < 640; i += 4) {
+  for (let j = 304; j < 336; j += 4) {
+    collisions.push([i, j].toString());
+  }
+}
+
 export const COLLISIONS = collisions;
