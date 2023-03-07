@@ -118,15 +118,51 @@ export class Sprite {
       this.playerSprite.zIndex = y;
       this.playerSprite.position.set(x - 8, y - 16);
     } else {
-      const x =
-        this.playerObject.x + this.Utils.xOffSet() - state.cameraPerson.x;
-      const y =
-        this.playerObject.y + this.Utils.yOffSet() - state.cameraPerson.y;
-      if (state.direction !== undefined) {
-        this.playAnimation(state.direction);
+      let xcenter = state.cameraPerson.x;
+      let ycenter = state.cameraPerson.y;
+      if (
+        state.cameraPerson.x > 392 &&
+        state.cameraPerson.x < 232 &&
+        state.cameraPerson.y > 396 &&
+        state.cameraPerson.y < 136
+      ) {
+        const x = this.playerObject.x + this.Utils.xOffSet() - xcenter;
+        const y = this.playerObject.y + this.Utils.yOffSet() - ycenter;
+        if (state.direction !== undefined) {
+          this.playAnimation(state.direction);
+        }
+        this.playerSprite.zIndex = y;
+        this.playerSprite.position.set(x - 8, y - 16);
+      } else {
+        if (state.cameraPerson.y > 396) {
+          ycenter = 396;
+          if (state.cameraPerson.x > 392) {
+            xcenter = 392;
+          } else if (state.cameraPerson.x < 232) {
+            xcenter = 232;
+          }
+        } else if (state.cameraPerson.y < 136) {
+          ycenter = 136;
+          if (state.cameraPerson.x > 392) {
+            xcenter = 392;
+          } else if (state.cameraPerson.x < 232) {
+            xcenter = 232;
+          }
+        } else {
+          if (state.cameraPerson.x > 392) {
+            xcenter = 392;
+          } else if (state.cameraPerson.x < 232) {
+            xcenter = 232;
+          }
+        }
+        const x = this.playerObject.x + this.Utils.xOffSet() - xcenter;
+        const y = this.playerObject.y + this.Utils.yOffSet() - ycenter;
+        if (state.direction !== undefined) {
+          this.playAnimation(state.direction);
+        }
+        this.playerSprite.zIndex = y;
+        this.playerSprite.position.set(x - 8, y - 16);
       }
-      this.playerSprite.zIndex = y;
-      this.playerSprite.position.set(x - 8, y - 16);
     }
   }
 
