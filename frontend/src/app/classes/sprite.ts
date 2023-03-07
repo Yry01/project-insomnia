@@ -91,33 +91,27 @@ export class Sprite {
     ) {
       let y = this.Utils.yOffSet();
       let x = this.Utils.xOffSet();
-      if (state.cameraPerson.y > 436) {
-        y = this.playerObject.y + this.Utils.yOffSet() - 436;
+      if (state.cameraPerson.y > 396) {
+        y = this.playerObject.y + this.Utils.yOffSet() - 396;
         if (state.cameraPerson.x > 392) {
           x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 156) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        } else if (state.cameraPerson.x < 232) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 232;
         }
       } else if (state.cameraPerson.y < 136) {
         y = this.playerObject.y + this.Utils.yOffSet() - 136;
         if (state.cameraPerson.x > 392) {
           x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 156) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        } else if (state.cameraPerson.x < 232) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 232;
         }
       } else {
         if (state.cameraPerson.x > 392) {
           x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 156) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 156;
+        } else if (state.cameraPerson.x < 232) {
+          x = this.playerObject.x + this.Utils.xOffSet() - 232;
         }
       }
-      // else if(state.cameraPerson.x>392) {
-      //   x = this.playerObject.x + this.Utils.xOffSet() - 392;
-      // }
-      // else if(state.cameraPerson.x<156) {
-      //   x = this.playerObject.x + this.Utils.xOffSet() - 156;
-      // }
       if (state.direction !== undefined) {
         this.playAnimation(state.direction);
       }

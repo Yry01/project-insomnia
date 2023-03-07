@@ -197,10 +197,10 @@ export class ChatTownComponent {
     // update map position
     const cameraPerson = this.allPlayersRef[this.playerId];
     if (
-      cameraPerson.x > 156 &&
+      cameraPerson.x > 232 &&
       cameraPerson.x < 392 &&
       cameraPerson.y > 136 &&
-      cameraPerson.y < 436
+      cameraPerson.y < 396
     ) {
       this.mapLowerContainer.position.set(
         this.Utils.xOffSet() - cameraPerson.x,
@@ -213,24 +213,24 @@ export class ChatTownComponent {
     } else {
       let xOffSet = this.Utils.xOffSet();
       let yOffSet = this.Utils.yOffSet();
-      if (cameraPerson.x < 156) {
+      if (cameraPerson.x < 232) {
         if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - 156;
+          xOffSet = xOffSet - 232;
           yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 436) {
-          xOffSet = xOffSet - 156;
-          yOffSet = yOffSet - 436;
+        } else if (cameraPerson.y > 396) {
+          xOffSet = xOffSet - 232;
+          yOffSet = yOffSet - 396;
         } else {
-          xOffSet = xOffSet - 156;
+          xOffSet = xOffSet - 232;
           yOffSet = yOffSet - cameraPerson.y;
         }
       } else if (cameraPerson.x > 392) {
         if (cameraPerson.y < 136) {
           xOffSet = xOffSet - 392;
           yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 436) {
+        } else if (cameraPerson.y > 396) {
           xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - 436;
+          yOffSet = yOffSet - 396;
         } else {
           xOffSet = xOffSet - 392;
           yOffSet = yOffSet - cameraPerson.y;
@@ -239,9 +239,9 @@ export class ChatTownComponent {
         if (cameraPerson.y < 136) {
           xOffSet = xOffSet - cameraPerson.x;
           yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 436) {
+        } else if (cameraPerson.y > 396) {
           xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - 436;
+          yOffSet = yOffSet - 396;
         } else {
           xOffSet = xOffSet - cameraPerson.x;
           yOffSet = yOffSet - cameraPerson.y;
