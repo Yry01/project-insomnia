@@ -23,4 +23,20 @@ const client = createClient({
 client.on("error", (err) => console.log("Redis Client Error", err));
 client.connect();
 
+// create socket server
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.FRONTEND_URL,
+  },
+});
+
+// socket connection
+io.on("connection", (socket) => {
+  console.log("a user connected");
+  socket.on("disconnect", () => {
+    console.log("user disconnected");
+  });
+});
+
 app.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
