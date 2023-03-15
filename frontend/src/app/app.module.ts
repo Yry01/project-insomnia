@@ -8,9 +8,10 @@ import { AngularFireModule } from '@angular/fire/compat';
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from '../environments/environment';
 import { ChatTownComponent } from './pages/chat-town/chat-town.component';
+import { LoginComponent } from './pages/login/login.component';
 
 @NgModule({
-  declarations: [AppComponent, ChatTownComponent],
+  declarations: [AppComponent, ChatTownComponent, LoginComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
