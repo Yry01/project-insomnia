@@ -1,5 +1,5 @@
 export const environment = {
-  production: true,
+  production: false,
   firebase: {
     apiKey: 'AIzaSyBE7Kzg1ueicv9JNrvvUU9Jj1jnlqbsJl8',
     authDomain: 'chat-room-2982b.firebaseapp.com',
@@ -8,4 +8,5 @@ export const environment = {
     messagingSenderId: '350052718241',
     appId: '1:350052718241:web:cf1d4c6d4cb3635dfe42e0',
   },
+  backendUrl: 'http://localhost:3000',
 };

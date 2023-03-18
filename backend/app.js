@@ -21,7 +21,7 @@ const client = createClient({
 });
 
 client.on("error", (err) => console.log("Redis Client Error", err));
-client.connect();
+client.connect().then(() => console.log("Redis Client Connected"));
 
 // create socket server
 const server = http.createServer(app);
@@ -33,9 +33,35 @@ const io = new Server(server, {
 
 // socket connection
 io.on("connection", (socket) => {
-  console.log("a user connected");
+  // send socket id to client
+  socket.emit("connection", socket.id);
+
+  // disconnect
   socket.on("disconnect", () => {
-    console.log("user disconnected");
+    client.hDel("players", socket.id).then(() => {
+      io.sockets.emit("playerQuit", socket.id);
+    });
+  });
+
+  // new player joined
+  socket.on("newPlayer", (data) => {
+    client.hSet("players", socket.id, JSON.stringify(data));
+    io.sockets.emit("newPlayer", data);
+  });
+
+  // existing players
+  socket.on("existingPlayers", () => {
+    client.hGetAll("players").then((players) => {
+      socket.emit("existingPlayers", players);
+    });
+  });
+
+  // player Moved
+  socket.on("playerMoved", (player) => {
+    client.hSet("players", player.id, JSON.stringify(player));
+    client.hGetAll("players").then((players) => {
+      io.sockets.emit("playerMoved", players);
+    });
   });
 });
 
