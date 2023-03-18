@@ -9,6 +9,7 @@ import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { environment } from '../environments/environment';
 import { ChatTownComponent } from './pages/chat-town/chat-town.component';
 import { LoginComponent } from './pages/login/login.component';
+import { AuthModule } from '@auth0/auth0-angular';
 
 @NgModule({
   declarations: [AppComponent, ChatTownComponent, LoginComponent],
@@ -17,6 +18,7 @@ import { LoginComponent } from './pages/login/login.component';
     AppRoutingModule,
     AngularFireModule.initializeApp(environment.firebase),
     AngularFireDatabaseModule,
+    AuthModule.forRoot(environment.auth),
   ],
   providers: [],
   bootstrap: [AppComponent],

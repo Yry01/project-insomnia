@@ -4,8 +4,8 @@ import { ChatTownComponent } from './pages/chat-town/chat-town.component';
 import { LoginComponent } from './pages/login/login.component';
 
 const routes: Routes = [
-  { path: '', component: ChatTownComponent },
-  { path: 'login', component: LoginComponent },
+  { path: 'chat-town', component: ChatTownComponent },
+  { path: '', component: LoginComponent },
 ];
 
 @NgModule({
