@@ -1,0 +1,10 @@
+<div>
+  <label for="phone-number">Phone Number:</label>
+  <input [(ngModel)]="phoneNumber" id="phone-number" type="tel" />
+  <!-- Add a label and input for the message -->
+  <label for="message">Message:</label>
+  <input [(ngModel)]="message" id="message" type="text" />
+  <!-- Add a button to submit the form -->
+  <button (click)="sendSMS()">Send SMS</button>
+</div>
+
