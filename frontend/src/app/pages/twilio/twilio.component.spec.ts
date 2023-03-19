@@ -8,9 +8,8 @@ describe('TwilioComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ TwilioComponent ]
-    })
-    .compileComponents();
+      declarations: [TwilioComponent],
+    }).compileComponents();
 
     fixture = TestBed.createComponent(TwilioComponent);
     component = fixture.componentInstance;

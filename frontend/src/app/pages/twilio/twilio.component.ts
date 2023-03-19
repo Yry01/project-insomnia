@@ -4,7 +4,7 @@ import { TwilioService } from '../../services/twilio.service';
 @Component({
   selector: 'app-twilio',
   templateUrl: './twilio.component.html',
-  styleUrls: ['./twilio.component.scss']
+  styleUrls: ['./twilio.component.scss'],
 })
 export class TwilioComponent {
   phoneNumber = '';
