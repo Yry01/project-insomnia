@@ -39,28 +39,28 @@ io.on("connection", (socket) => {
   // disconnect
   socket.on("disconnect", () => {
     client.hDel("players", socket.id).then(() => {
-      io.sockets.emit("playerQuit", socket.id);
+      io.sockets.emit("player_disconnected", socket.id);
     });
   });
 
   // new player joined
-  socket.on("newPlayer", (data) => {
+  socket.on("player_joined", (data) => {
     client.hSet("players", socket.id, JSON.stringify(data));
-    io.sockets.emit("newPlayer", data);
+    io.sockets.emit("player_joined", data);
   });
 
   // existing players
-  socket.on("existingPlayers", () => {
+  socket.on("online_players", () => {
     client.hGetAll("players").then((players) => {
-      socket.emit("existingPlayers", players);
+      socket.emit("online_players", players);
     });
   });
 
   // player Moved
-  socket.on("playerMoved", (player) => {
+  socket.on("player_moved", (player) => {
     client.hSet("players", player.id, JSON.stringify(player));
     client.hGetAll("players").then((players) => {
-      io.sockets.emit("playerMoved", players);
+      io.sockets.emit("player_moved", players);
     });
   });
 });

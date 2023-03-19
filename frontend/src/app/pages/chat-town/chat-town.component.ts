@@ -1,7 +1,4 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthService } from '../../services/auth.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
 import { KeyPressListener } from 'src/app/classes/key-press-listener';
@@ -57,37 +54,11 @@ export class ChatTownComponent implements OnInit {
   socket: any;
 
   constructor(
-    private db: AngularFireDatabase,
-    private afAuth: AngularFireAuth,
-    private authService: AuthService,
     private Utils: UtilsService,
     private Collisions: CollisionsService
   ) {}
 
   ngOnInit(): void {
-    // this.afAuth.onAuthStateChanged((user) => {
-    //   if (user) {
-    //     // you're' logged in
-    //     this.playerId = user.uid;
-    //     this.playerRef = this.db.database.ref(`players/${this.playerId}`);
-    //     this.playerRef.set({
-    //       id: this.playerId,
-    //       skin: this.skins[Math.floor(Math.random() * 15)],
-    //       direction: 'down',
-    //       x: this.Utils.withGrid(24),
-    //       y: this.Utils.withGrid(22),
-    //     });
-
-    //     this.playerRef.onDisconnect().remove();
-
-    //     // initialize the game
-    //     this.initGame();
-    //   } else {
-    //     // you're logged out
-    //   }
-    // });
-
-    // this.authService.login();
     this.initGame();
   }
 
@@ -104,7 +75,7 @@ export class ChatTownComponent implements OnInit {
     this.initMap();
 
     // initialize listeners on player movement
-    this.initListenersOnPlayerMovement2();
+    this.initListenersOnPlayerMovement();
 
     // initialize keyboard controls
     this.keyPressListener();
@@ -139,15 +110,14 @@ export class ChatTownComponent implements OnInit {
     this.mapUpperContainer.addChild(mapUpper);
   }
 
-  initListenersOnPlayerMovement2() {
+  initListenersOnPlayerMovement() {
     this.socket = io(environment.backendUrl);
 
     this.socket.on('connection', (id: any) => {
       // add me to the game
       this.playerId = id;
-      console.log('my id is: ', this.playerId);
       // notify new player joined the server
-      this.socket.emit('newPlayer', {
+      this.socket.emit('player_joined', {
         id: id,
         skin: this.skins[Math.floor(Math.random() * 15)],
         direction: 'down',
@@ -155,29 +125,32 @@ export class ChatTownComponent implements OnInit {
         y: this.Utils.withGrid(22),
       });
 
-      // render other existing players
-      this.socket.emit('existingPlayers');
+      // render all online players
+      this.socket.emit('online_players');
+    });
+    
+    // listen to new player joined
+    this.socket.on('player_joined', (player: any) => {
+      this.addPlayerToGame(player);
     });
 
-    this.socket.on('existingPlayers', (players: any) => {
+    // listen to online players response
+    this.socket.on('online_players', (players: any) => {
       Object.values(players).forEach((player: any) => {
         player = JSON.parse(player);
         this.addPlayerToGame(player);
       });
     });
 
-    this.socket.on('playerMoved', (players: any) => {
+    this.socket.on('player_moved', (players: any) => {
       Object.values(players).forEach((player: any) => {
         player = JSON.parse(player);
-        this.loadOtherPlayers2(player);
+        this.loadOtherPlayers(player);
       });
+      this.renderMap();
     });
 
-    this.socket.on('newPlayer', (player: any) => {
-      this.addPlayerToGame(player);
-    });
-
-    this.socket.on('playerQuit', (playerId: string) => {
+    this.socket.on('player_disconnected', (playerId: string) => {
       this.allPlayers[playerId].remove();
       delete this.allPlayers[playerId];
     });
@@ -197,57 +170,6 @@ export class ChatTownComponent implements OnInit {
     this.loadOtherPlayers(player);
   }
 
-  initListenersOnPlayerMovement() {
-    // real time player activities updates
-    const allPlayersRef = this.db.database.ref('players');
-
-    allPlayersRef.on('value', (snapshot: any) => {
-      this.allPlayersRef = snapshot.val();
-      console.log(Object.values(this.allPlayersRef));
-      Object.values(this.allPlayersRef).forEach((player: any) => {
-        this.loadOtherPlayers(player);
-      });
-    });
-
-    allPlayersRef.on('child_added', (snapshot: any) => {
-      console.log('child_added');
-      const playerSnapshot = snapshot.val();
-
-      // add player to the game
-      const newPlayer = new Player({
-        id: playerSnapshot.id,
-        x: playerSnapshot.x,
-        y: playerSnapshot.y,
-        skin: playerSnapshot.skin,
-        direction: playerSnapshot.direction,
-        container: this.playersContainer,
-      });
-
-      // add player to the list of all players (in memory)
-      this.allPlayers[playerSnapshot.id] = newPlayer;
-    });
-
-    allPlayersRef.on('child_removed', (snapshot: any) => {
-      const removedPlayer = snapshot.val();
-      this.allPlayers[removedPlayer.id].remove();
-      delete this.allPlayers[removedPlayer.id];
-    });
-  }
-
-  loadOtherPlayers2(player: any) {
-    if (this.allPlayers[player.id].isSpriteLoaded === false) {
-      setTimeout(() => {
-        this.loadOtherPlayers(player);
-      }, 100);
-    } else {
-      this.allPlayers[player.id].update({
-        x: player.x,
-        y: player.y,
-        cameraPerson: this.allPlayers[this.playerId],
-      });
-    }
-  }
-
   loadOtherPlayers(player: any) {
     if (this.allPlayers[player.id].isSpriteLoaded === false) {
       setTimeout(() => {
@@ -262,104 +184,8 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
-  handleArrowPress(direction: string) {
-    const mePlayer = this.allPlayers[this.playerId];
-    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
-      //move to the next space
-      mePlayer.update({
-        direction: direction,
-        cameraPerson: this.allPlayersRef[this.playerId],
-      });
-      this.allPlayersRef[this.playerId].x = mePlayer.x;
-      this.allPlayersRef[this.playerId].y = mePlayer.y;
-      this.allPlayersRef[this.playerId].direction = mePlayer.direction;
-      this.playerRef.set(this.allPlayersRef[this.playerId]);
-    } else {
-      mePlayer.playAnimation(direction);
-    }
-
-    // update map position
-    const cameraPerson = this.allPlayersRef[this.playerId];
-    if (
-      cameraPerson.x > 232 &&
-      cameraPerson.x < 392 &&
-      cameraPerson.y > 136 &&
-      cameraPerson.y < 396
-    ) {
-      this.mapLowerContainer.position.set(
-        this.Utils.xOffSet() - cameraPerson.x,
-        this.Utils.yOffSet() - cameraPerson.y
-      );
-      this.mapUpperContainer.position.set(
-        this.Utils.xOffSet() - cameraPerson.x,
-        this.Utils.yOffSet() - cameraPerson.y
-      );
-    } else {
-      let xOffSet = this.Utils.xOffSet();
-      let yOffSet = this.Utils.yOffSet();
-      if (cameraPerson.x < 232) {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      } else if (cameraPerson.x > 392) {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      } else {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      }
-      this.mapLowerContainer.position.set(xOffSet, yOffSet);
-      this.mapUpperContainer.position.set(xOffSet, yOffSet);
-    }
-  }
-
-  handleArrowPress2(direction: string) {
-    const mePlayer = this.allPlayers[this.playerId];
-    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
-      //move to the next space
-      mePlayer.update({
-        direction: direction,
-        cameraPerson: this.allPlayers[this.playerId],
-      });
-      this.allPlayers[this.playerId].x = mePlayer.x;
-      this.allPlayers[this.playerId].y = mePlayer.y;
-      this.allPlayers[this.playerId].direction = mePlayer.direction;
-
-      this.socket.emit('playerMoved', {
-        id: this.playerId,
-        x: mePlayer.x,
-        y: mePlayer.y,
-        direction: mePlayer.direction,
-        skin: mePlayer.skin,
-      });
-    } else {
-      mePlayer.playAnimation(direction);
-    }
-
-    // update map position
+  renderMap() {
+    // render map based on camera person's position
     const cameraPerson = this.allPlayers[this.playerId];
     if (
       cameraPerson.x > 232 &&
@@ -417,10 +243,34 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  handleArrowPress(direction: string) {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
+      //move to the next space
+      mePlayer.update({
+        direction: direction,
+        cameraPerson: this.allPlayers[this.playerId],
+      });
+      this.allPlayers[this.playerId].x = mePlayer.x;
+      this.allPlayers[this.playerId].y = mePlayer.y;
+      this.allPlayers[this.playerId].direction = mePlayer.direction;
+
+      this.socket.emit('player_moved', {
+        id: this.playerId,
+        x: mePlayer.x,
+        y: mePlayer.y,
+        direction: mePlayer.direction,
+        skin: mePlayer.skin,
+      });
+    } else {
+      mePlayer.playAnimation(direction);
+    }
+  }
+
   keyPressListener() {
-    new KeyPressListener('KeyW', () => this.handleArrowPress2('up'));
-    new KeyPressListener('KeyS', () => this.handleArrowPress2('down'));
-    new KeyPressListener('KeyA', () => this.handleArrowPress2('left'));
-    new KeyPressListener('KeyD', () => this.handleArrowPress2('right'));
+    new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
+    new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
+    new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
+    new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
   }
 }
