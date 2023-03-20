@@ -4,10 +4,25 @@ const twilio = require("twilio");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
+const postgres = require("pg");
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+
+const client = new postgres.Client({
+  host: "localhost",
+  port: 5432,
+  user: "postgres",
+  password: "yuerunyu1",
+  database: "user-info",
+});
+
+client.connect()
+  .then(() => console.log("Postgres running on port localhost:5432"))
+
+
+
 
 app.post("/send-sms", (req, res) => {
   const accountSid = "AC662c7db6285d6b82a91d93d37a8ab278";
@@ -23,7 +38,9 @@ app.post("/send-sms", (req, res) => {
       to: to,
     })
     .then((message) => res.status(200).json({ message: "SMS sent!" }))
-    .catch((err) => res.status(500).json({ error: err.message }));
+    .catch((err) => {
+      res.status(500).json({ message: "Something went wrong" });
+    });
 });
 
 app.listen(port, () => {
