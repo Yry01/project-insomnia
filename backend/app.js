@@ -4,22 +4,31 @@ const twilio = require("twilio");
 const cors = require("cors");
 const app = express();
 const port = process.env.PORT || 3000;
-const postgres = require("pg");
+const sql = require('mssql');
+
 
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
-const client = new postgres.Client({
-  host: "localhost",
-  port: 5432,
-  user: "postgres",
-  password: "yuerunyu1",
-  database: "user-info",
+// config for your database
+const config = {
+  user: 'CloudSA4069d47d',
+  password: 'yuerunyu1.',
+  server: 'chat-town.database.windows.net', 
+  database: 'chat-town', 
+  options: {
+    encrypt: true,
+    enableArithAbort: true
+  }
+};
+
+// connect to your database
+sql.connect(config, function (err) {
+  if (err) console.log(err);
+  else console.log('Database connected');
 });
 
-client.connect()
-  .then(() => console.log("Postgres running on port localhost:5432"))
 
 
 
