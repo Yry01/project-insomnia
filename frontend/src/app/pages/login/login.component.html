@@ -12,9 +12,7 @@
 </header>
 
 <div *ngIf="auth.user$ | async as user">
-  <div>Welcome {{ user.email }}</div>
-</div>
-
-<div id="game-container">
-  <canvas id="game-canvas"></canvas>
+  <h2>Welcome</h2>
+  <p>{{ user.email }}</p>
+  <img [src]="user.picture" />
 </div>

@@ -8,4 +8,11 @@ export const environment = {
     messagingSenderId: '350052718241',
     appId: '1:350052718241:web:cf1d4c6d4cb3635dfe42e0',
   },
+  auth: {
+    domain: 'dev-hpc5hctabd1e0xhl.us.auth0.com',
+    clientId: 'yTAS8N2p5Nog3fAxbQ5uuzbborxoSv3e',
+    authorizationParams: {
+      redirect_uri: window.location.origin,
+    },
+  },
 };
