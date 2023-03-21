@@ -1,19 +1,20 @@
 import { Component, OnInit } from '@angular/core';
 import { AngularFireDatabase } from '@angular/fire/compat/database';
 import { AngularFireAuth } from '@angular/fire/compat/auth';
-import { AuthService } from '../../services/auth.service';
+// import { AuthService } from '../../services/auth.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
 import { KeyPressListener } from 'src/app/classes/key-press-listener';
 import * as PIXI from 'pixi.js';
 import { CollisionsService } from '../../services/collisions.service';
+import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
   selector: 'app-chat-town',
   templateUrl: './chat-town.component.html',
   styleUrls: ['./chat-town.component.scss'],
 })
-export class ChatTownComponent {
+export class ChatTownComponent implements OnInit {
   // canvas info
   WIDTH = 480;
   HEIGHT = 320;
@@ -54,7 +55,7 @@ export class ChatTownComponent {
   constructor(
     private db: AngularFireDatabase,
     private afAuth: AngularFireAuth,
-    private authService: AuthService,
+    public auth: AuthService,
     private Utils: UtilsService,
     private Collisions: CollisionsService
   ) {}
@@ -82,7 +83,7 @@ export class ChatTownComponent {
       }
     });
 
-    this.authService.login();
+    // this.authService.login();
   }
 
   initGame() {

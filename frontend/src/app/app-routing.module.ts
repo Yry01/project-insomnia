@@ -5,8 +5,8 @@ import { LoginComponent } from './pages/login/login.component';
 import { TwilioComponent } from './pages/twilio/twilio.component';
 
 const routes: Routes = [
-  { path: 'chat-town', component: ChatTownComponent },
-  { path: '', component: LoginComponent },
+  { path: '', component: ChatTownComponent },
+  // { path: '', component: LoginComponent },
   { path: 'twilio', component: TwilioComponent },
 ];
 
