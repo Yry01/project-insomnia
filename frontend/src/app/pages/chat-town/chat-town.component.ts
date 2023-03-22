@@ -1,12 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-import { AngularFireDatabase } from '@angular/fire/compat/database';
-import { AngularFireAuth } from '@angular/fire/compat/auth';
-// import { AuthService } from '../../services/auth.service';
 import { UtilsService } from 'src/app/services/utils.service';
 import { Player } from '../../classes/player';
 import { KeyPressListener } from 'src/app/classes/key-press-listener';
 import * as PIXI from 'pixi.js';
 import { CollisionsService } from '../../services/collisions.service';
+import { io } from 'socket.io-client';
+import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
 
 @Component({
@@ -52,38 +51,17 @@ export class ChatTownComponent implements OnInit {
     '../assets/skins/tbug.png',
   ];
 
+  // socket.io
+  socket: any;
+
   constructor(
-    private db: AngularFireDatabase,
-    private afAuth: AngularFireAuth,
     public auth: AuthService,
     private Utils: UtilsService,
     private Collisions: CollisionsService
   ) {}
 
   ngOnInit(): void {
-    this.afAuth.onAuthStateChanged((user) => {
-      if (user) {
-        // you're' logged in
-        this.playerId = user.uid;
-        this.playerRef = this.db.database.ref(`players/${this.playerId}`);
-        this.playerRef.set({
-          id: this.playerId,
-          skin: this.skins[Math.floor(Math.random() * 15)],
-          direction: 'down',
-          x: this.Utils.withGrid(24),
-          y: this.Utils.withGrid(22),
-        });
-
-        this.playerRef.onDisconnect().remove();
-
-        // initialize the game
-        this.initGame();
-      } else {
-        // you're logged out
-      }
-    });
-
-    // this.authService.login();
+    this.initGame();
   }
 
   initGame() {
@@ -135,38 +113,63 @@ export class ChatTownComponent implements OnInit {
   }
 
   initListenersOnPlayerMovement() {
-    // real time player activities updates
-    const allPlayersRef = this.db.database.ref('players');
+    this.socket = io(environment.backendUrl);
 
-    allPlayersRef.on('value', (snapshot: any) => {
-      this.allPlayersRef = snapshot.val();
-      Object.values(this.allPlayersRef).forEach((player: any) => {
+    this.socket.on('connection', (id: any) => {
+      // add me to the game
+      this.playerId = id;
+      // notify new player joined the server
+      this.socket.emit('player_joined', {
+        id: id,
+        skin: this.skins[Math.floor(Math.random() * 15)],
+        direction: 'down',
+        x: this.Utils.withGrid(24),
+        y: this.Utils.withGrid(22),
+      });
+
+      // render all online players
+      this.socket.emit('online_players');
+    });
+    
+    // listen to new player joined
+    this.socket.on('player_joined', (player: any) => {
+      this.addPlayerToGame(player);
+    });
+
+    // listen to online players response
+    this.socket.on('online_players', (players: any) => {
+      Object.values(players).forEach((player: any) => {
+        player = JSON.parse(player);
+        this.addPlayerToGame(player);
+      });
+    });
+
+    this.socket.on('player_moved', (players: any) => {
+      Object.values(players).forEach((player: any) => {
+        player = JSON.parse(player);
         this.loadOtherPlayers(player);
       });
+      this.renderMap();
     });
 
-    allPlayersRef.on('child_added', (snapshot: any) => {
-      const playerSnapshot = snapshot.val();
-
-      // add player to the game
-      const newPlayer = new Player({
-        id: playerSnapshot.id,
-        x: playerSnapshot.x,
-        y: playerSnapshot.y,
-        skin: playerSnapshot.skin,
-        direction: playerSnapshot.direction,
-        container: this.playersContainer,
-      });
-
-      // add player to the list of all players (in memory)
-      this.allPlayers[playerSnapshot.id] = newPlayer;
+    this.socket.on('player_disconnected', (playerId: string) => {
+      this.allPlayers[playerId].remove();
+      delete this.allPlayers[playerId];
     });
+  }
 
-    allPlayersRef.on('child_removed', (snapshot: any) => {
-      const removedPlayer = snapshot.val();
-      this.allPlayers[removedPlayer.id].remove();
-      delete this.allPlayers[removedPlayer.id];
+  addPlayerToGame(player: any) {
+    // add player to the game
+    const newPlayer = new Player({
+      id: player.id,
+      x: player.x,
+      y: player.y,
+      skin: player.skin,
+      direction: player.direction,
+      container: this.playersContainer,
     });
+    this.allPlayers[player.id] = newPlayer;
+    this.loadOtherPlayers(player);
   }
 
   loadOtherPlayers(player: any) {
@@ -178,29 +181,14 @@ export class ChatTownComponent implements OnInit {
       this.allPlayers[player.id].update({
         x: player.x,
         y: player.y,
-        cameraPerson: this.allPlayersRef[this.playerId],
+        cameraPerson: this.allPlayers[this.playerId],
       });
     }
   }
 
-  handleArrowPress(direction: string) {
-    const mePlayer = this.allPlayers[this.playerId];
-    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
-      //move to the next space
-      mePlayer.update({
-        direction: direction,
-        cameraPerson: this.allPlayersRef[this.playerId],
-      });
-      this.allPlayersRef[this.playerId].x = mePlayer.x;
-      this.allPlayersRef[this.playerId].y = mePlayer.y;
-      this.allPlayersRef[this.playerId].direction = mePlayer.direction;
-      this.playerRef.set(this.allPlayersRef[this.playerId]);
-    } else {
-      mePlayer.playAnimation(direction);
-    }
-
-    // update map position
-    const cameraPerson = this.allPlayersRef[this.playerId];
+  renderMap() {
+    // render map based on camera person's position
+    const cameraPerson = this.allPlayers[this.playerId];
     if (
       cameraPerson.x > 232 &&
       cameraPerson.x < 392 &&
@@ -255,16 +243,30 @@ export class ChatTownComponent implements OnInit {
       this.mapLowerContainer.position.set(xOffSet, yOffSet);
       this.mapUpperContainer.position.set(xOffSet, yOffSet);
     }
-    // if (cameraPerson.y>136&&cameraPerson.y<436){
-    //   this.mapLowerContainer.position.set(
-    //     this.Utils.xOffSet() - cameraPerson.x,
-    //     this.Utils.yOffSet() - cameraPerson.y
-    //   );
-    //   this.mapUpperContainer.position.set(
-    //     this.Utils.xOffSet() - cameraPerson.x,
-    //     this.Utils.yOffSet() - cameraPerson.y
-    //   );
-    // }
+  }
+
+  handleArrowPress(direction: string) {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (!this.Collisions.checkCollisions(mePlayer, direction)) {
+      //move to the next space
+      mePlayer.update({
+        direction: direction,
+        cameraPerson: this.allPlayers[this.playerId],
+      });
+      this.allPlayers[this.playerId].x = mePlayer.x;
+      this.allPlayers[this.playerId].y = mePlayer.y;
+      this.allPlayers[this.playerId].direction = mePlayer.direction;
+
+      this.socket.emit('player_moved', {
+        id: this.playerId,
+        x: mePlayer.x,
+        y: mePlayer.y,
+        direction: mePlayer.direction,
+        skin: mePlayer.skin,
+      });
+    } else {
+      mePlayer.playAnimation(direction);
+    }
   }
 
   keyPressListener() {
