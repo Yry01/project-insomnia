@@ -130,7 +130,7 @@ export class ChatTownComponent implements OnInit {
       // render all online players
       this.socket.emit('online_players');
     });
-    
+
     // listen to new player joined
     this.socket.on('player_joined', (player: any) => {
       this.addPlayerToGame(player);
