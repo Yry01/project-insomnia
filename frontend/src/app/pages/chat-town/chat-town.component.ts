@@ -61,7 +61,12 @@ export class ChatTownComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.initGame();
+    const isAuthenticated = this.auth.isAuthenticated$;
+    isAuthenticated.subscribe((isAuth) => {
+      if (isAuth) {
+        this.initGame();
+      }
+    });
   }
 
   initGame() {
