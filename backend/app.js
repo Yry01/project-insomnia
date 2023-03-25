@@ -3,7 +3,7 @@ import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import http from "http";
 import dotenv from "dotenv";
-import { createClient } from "redis";
+import redis from "redis";
 import sql from "mssql";
 import twilio from "twilio";
 
@@ -52,12 +52,16 @@ app.post("/send-sms", (req, res) => {
 });
 
 // connect to redis
-const client = createClient({
-  password: process.env.REDIS_PASSWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-  },
+// const client = createClient({
+//   password: process.env.REDIS_PASSWORD,
+//   socket: {
+//     host: process.env.REDIS_HOST,
+//     port: process.env.REDIS_PORT,
+//   },
+// });
+
+const client = redis.createClient({
+  url: "redis://redis:6379",
 });
 
 client.on("error", (err) => console.log("Redis Client Error", err));
@@ -67,7 +71,7 @@ client.connect().then(() => console.log("Redis Client Connected"));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+	  origin: "*",
   },
 });
 
