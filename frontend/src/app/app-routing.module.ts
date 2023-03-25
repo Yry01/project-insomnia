@@ -8,6 +8,7 @@ const routes: Routes = [
   { path: '', component: ChatTownComponent },
   // { path: '', component: LoginComponent },
   { path: 'twilio', component: TwilioComponent },
+  { path: 'test', component: LoginComponent },
 ];
 
 @NgModule({

@@ -11,6 +11,7 @@ import { AuthModule } from '@auth0/auth0-angular';
 import { TwilioComponent } from './pages/twilio/twilio.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
+import { TestComponent } from './pages/test-component/test-component.component';
 
 import { environment } from '../environments/environment';
 
@@ -20,6 +21,7 @@ import { environment } from '../environments/environment';
     ChatTownComponent,
     LoginComponent,
     TwilioComponent,
+    TestComponent,
   ],
   imports: [
     BrowserModule,
