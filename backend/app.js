@@ -117,7 +117,7 @@ io.on("connection", (socket) => {
 const peerServer = ExpressPeerServer(server, {
   debug: true,
   path: "/",
-  cors: corsOptions,
+  port: PORT,
 });
 
 app.use(

@@ -7,6 +7,8 @@ import { CollisionsService } from '../../services/collisions.service';
 import { io } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
+import Peer, { MediaConnection } from 'peerjs';
+
 
 @Component({
   selector: 'app-chat-town',
@@ -30,6 +32,9 @@ export class ChatTownComponent implements OnInit {
   playerRef!: any;
   allPlayersRef!: any;
   allPlayers: { [key: string]: Player } = {};
+
+  //peer object
+  peer!: Peer;
 
   // player skins
   skins = [
@@ -165,6 +170,7 @@ export class ChatTownComponent implements OnInit {
 
   addPlayerToGame(player: any) {
     // add player to the game
+    const peerid = this.createPeerConnection();
     const newPlayer = new Player({
       id: player.id,
       x: player.x,
@@ -172,6 +178,7 @@ export class ChatTownComponent implements OnInit {
       skin: player.skin,
       direction: player.direction,
       container: this.playersContainer,
+      peerid: peerid,
     });
     this.allPlayers[player.id] = newPlayer;
     this.loadOtherPlayers(player);
@@ -274,10 +281,90 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  createPeerConnection(): Promise<string> {
+    return new Promise((resolve) => {
+      this.peer = new Peer({
+        host: 'cscc09.insonmiachat.one',
+        port: 3000, // You can remove this line if using the default secure port (443)
+        path: '/peerjs',
+        secure: true,
+      });
+
+      this.peer.on('open', (id: string) => {
+        console.log('Connected to the signaling server. My ID:', id);
+        this.answerCall(this.peer); // Set up the event listener for incoming calls
+        resolve(id); // Resolve the promise with the peer ID
+      });
+    });
+  }
+
+
+
+  async getUserMediaStream(): Promise<MediaStream> {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      return stream;
+    } catch (error) {
+      console.error('Error getting user media:', error);
+      throw error;
+    }
+  }
+
+  async callUser(peer: Peer, targetPeerId: string) {
+    try {
+      const stream = await this.getUserMediaStream();
+      const call = peer.call(targetPeerId, stream);
+      call.on('stream', (remoteStream: MediaStream) => {
+        // Handle the remote stream (e.g., play it in an audio element)
+        this.playRemoteStream(remoteStream);
+      });
+    } catch (error) {
+      console.error('Error calling user:', error);
+    }
+  }
+
+  async answerCall(peer: Peer) {
+    peer.on('call', async (call: MediaConnection) => {
+      try {
+        const stream = await this.getUserMediaStream();
+        call.answer(stream);
+        call.on('stream', (remoteStream: MediaStream) => {
+          // Handle the remote stream (e.g., play it in an audio element)
+          this.playRemoteStream(remoteStream);
+        });
+      } catch (error) {
+        console.error('Error answering call:', error);
+      }
+    });
+  }
+
+  playRemoteStream(remoteStream: MediaStream) {
+    const audioElement = document.createElement('audio');
+    audioElement.srcObject = remoteStream;
+    audioElement.play();
+  }
+
+  callNearestUser() {
+    const mePlayer = this.allPlayers[this.playerId];
+    //check if there are other players in the room
+    if (Object.keys(this.allPlayers).length > 1) {
+      for(const player of Object.values(this.allPlayers)) {
+        if (player.id !== this.playerId) {
+          this.callUser(this.peer, player.id);
+        }
+      }
+    }
+    console.log("No other players in the room");
+
+  }
+
+
+
   keyPressListener() {
     new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
     new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
     new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
     new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
+    new KeyPressListener('KeyF', () => this.callNearestUser());
   }
 }
