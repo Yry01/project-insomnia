@@ -14,13 +14,21 @@ export class TestComponent implements OnInit {
   ngOnInit(): void {
     this.peer = new Peer({
       host: 'cscc09.insonmiachat.one',
-      port: 443, // You can remove this line if using the default secure port (443)
+      port: 3000, //You can remove this line if using the default secure port (443)
       path: '/peerjs',
-      secure: true,
+      //      secure: true,
     });
 
-    this.peer.on('open', (id) => {
+    this.peer.on('open', (id: string) => {
       console.log('Connected to the signaling server. My ID:', id);
+    });
+    // When a connection is received, print a message
+    this.peer.on('connection', (conn) => {
+      console.log('Connection established with:', conn.peer);
+
+      conn.on('data', (data) => {
+        console.log('Received data:', data);
+      });
     });
   }
 }

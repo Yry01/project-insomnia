@@ -116,21 +116,7 @@ io.on("connection", (socket) => {
 const peerServer = ExpressPeerServer(server, {
   debug: true,
   path: "/",
-  port: PORT,
 });
-
-app.use(
-  "/peerjs",
-  (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Methods", "GET, POST");
-    res.header(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, Accept, X-Requested-With, Origin, Access-Control-Allow-Origin"
-    );
-    next();
-  },
-  peerServer
-);
+app.use("/peerjs", peerServer);
 
 server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));
