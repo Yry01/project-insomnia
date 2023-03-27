@@ -382,6 +382,16 @@ export class ChatTownComponent implements OnInit {
           console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
         });
+        // Handle call close event
+        call.on('close', () => {
+          console.log(
+            `Call with user ${call.peer} has been hung up by receiver.`
+          );
+          delete this.currentCalls[call.peer];
+        });
+
+        // Store the call in the currentCalls object
+        this.currentCalls[call.peer] = call;
       } catch (error) {
         console.error('Error answering call:', error);
       }
