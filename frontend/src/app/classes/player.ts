@@ -1,11 +1,14 @@
 import { Sprite } from './sprite';
 
 export class Player {
+  id: string;
   x: number;
   y: number;
+  skin: string;
   direction: string = 'down';
   isSpriteLoaded: boolean = false;
   isPlayerMoving: boolean = false;
+  peerid!: string;
 
   private sprite: Sprite;
   private moveUpdate: { [key: string]: [number, number] } = {
@@ -16,14 +19,17 @@ export class Player {
   };
 
   constructor(config: any) {
+    this.id = config.id;
     this.x = config.x || 0;
     this.y = config.y || 0;
+    this.skin = config.skin;
     this.sprite = new Sprite({
       skin: config.skin,
       playerObject: this,
       container: config.container,
       direction: config.direction,
     });
+    this.peerid = config.peerid;
   }
 
   get playerSprite() {

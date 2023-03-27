@@ -2,9 +2,6 @@
   <h3>Login page</h3>
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
     <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
-    <div *ngIf="auth.user$ | async as user">
-      <div>Welcome {{ user.email }}</div>
-    </div>
   </div>
 
   <ng-template #loggedOut>
@@ -14,6 +11,10 @@
   </ng-template>
 </header>
 
-<div id="game-container">
-  <canvas id="game-canvas"></canvas>
+<div *ngIf="auth.user$ | async as user">
+  <h2>Welcome</h2>
+  <p>{{ user.email }}</p>
+  <img [src]="user.picture" />
 </div>
+
+<app-test-component></app-test-component>

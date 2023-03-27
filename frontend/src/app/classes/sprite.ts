@@ -3,7 +3,6 @@ import { UtilsService } from '../services/utils.service';
 import * as PIXI from 'pixi.js';
 
 export class Sprite {
-  private skin: string;
   playerSprite!: PIXI.AnimatedSprite;
   private animateSpriteSheet: any;
   private container: PIXI.Container;
@@ -12,11 +11,10 @@ export class Sprite {
 
   constructor(config: any) {
     this.container = config.container;
-    this.skin = config.skin;
     this.playerObject = config.playerObject;
 
     // load the texture we need
-    PIXI.Assets.load(this.skin).then((texture) => {
+    PIXI.Assets.load(config.skin).then((texture) => {
       this.createSpriteSheet(texture);
       this.createPlayerSprite(texture, config);
     });
