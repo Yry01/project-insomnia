@@ -67,8 +67,10 @@ export class ChatTownComponent implements OnInit {
 
   ngOnInit(): void {
     const isAuthenticated = this.auth.isAuthenticated$;
-    isAuthenticated.subscribe((isAuth) => {
+    isAuthenticated.subscribe(async (isAuth) => {
       if (isAuth) {
+        this.peer = await this.createPeerConnection();
+        this.answerCall(this.peer);
         this.initGame();
       }
     });
@@ -131,6 +133,7 @@ export class ChatTownComponent implements OnInit {
       // notify new player joined the server
       this.socket.emit('player_joined', {
         id: id,
+        peerid : this.peer.id,
         skin: this.skins[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
@@ -170,7 +173,6 @@ export class ChatTownComponent implements OnInit {
 
   addPlayerToGame(player: any) {
     // add player to the game
-    const peerid = this.createPeerConnection();
     const newPlayer = new Player({
       id: player.id,
       x: player.x,
@@ -178,7 +180,7 @@ export class ChatTownComponent implements OnInit {
       skin: player.skin,
       direction: player.direction,
       container: this.playersContainer,
-      peerid: peerid,
+      peerid: player.peerid,
     });
     this.allPlayers[player.id] = newPlayer;
     this.loadOtherPlayers(player);
@@ -281,7 +283,7 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
-  createPeerConnection(): Promise<string> {
+  createPeerConnection(): Promise<Peer> {
     return new Promise((resolve) => {
       this.peer = new Peer({
         host: 'cscc09.insonmiachat.one',
@@ -293,7 +295,11 @@ export class ChatTownComponent implements OnInit {
       this.peer.on('open', (id: string) => {
         console.log('Connected to the signaling server. My ID:', id);
         this.answerCall(this.peer); // Set up the event listener for incoming calls
-        resolve(id); // Resolve the promise with the peer ID
+        resolve(this.peer); // Resolve the promise with the peer ID
+      });
+
+      this.peer.on('error', (error: any) => {
+        console.error('Error connecting to the signaling server:', error);
       });
     });
   }
@@ -303,6 +309,7 @@ export class ChatTownComponent implements OnInit {
   async getUserMediaStream(): Promise<MediaStream> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Got user media stream:', stream);
       return stream;
     } catch (error) {
       console.error('Error getting user media:', error);
@@ -313,9 +320,12 @@ export class ChatTownComponent implements OnInit {
   async callUser(peer: Peer, targetPeerId: string) {
     try {
       const stream = await this.getUserMediaStream();
+      console.log('Calling user:', targetPeerId);
       const call = peer.call(targetPeerId, stream);
+      console.log("call is: ", call);
       call.on('stream', (remoteStream: MediaStream) => {
         // Handle the remote stream (e.g., play it in an audio element)
+        console.log("audio should be playing in callUser");
         this.playRemoteStream(remoteStream);
       });
     } catch (error) {
@@ -325,11 +335,15 @@ export class ChatTownComponent implements OnInit {
 
   async answerCall(peer: Peer) {
     peer.on('call', async (call: MediaConnection) => {
+      console.log('Call event triggered');
       try {
+        console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
+        console.log("stream is: ", stream);
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
           // Handle the remote stream (e.g., play it in an audio element)
+          console.log("audio should be playing in answerCall");
           this.playRemoteStream(remoteStream);
         });
       } catch (error) {
@@ -339,6 +353,7 @@ export class ChatTownComponent implements OnInit {
   }
 
   playRemoteStream(remoteStream: MediaStream) {
+    console.log("audio should be playing");
     const audioElement = document.createElement('audio');
     audioElement.srcObject = remoteStream;
     audioElement.play();
@@ -350,11 +365,15 @@ export class ChatTownComponent implements OnInit {
     if (Object.keys(this.allPlayers).length > 1) {
       for(const player of Object.values(this.allPlayers)) {
         if (player.id !== this.playerId) {
-          this.callUser(this.peer, player.id);
+          console.log(player.peerid);
+          this.callUser(this.peer, player.peerid);
+          break;
         }
       }
     }
-    console.log("No other players in the room");
+    else{
+      console.log("No other players in the room");
+    }
 
   }
 
