@@ -8,6 +8,7 @@ export class Player {
   direction: string = 'down';
   isSpriteLoaded: boolean = false;
   isPlayerMoving: boolean = false;
+  peerid!: string;
 
   private sprite: Sprite;
   private moveUpdate: { [key: string]: [number, number] } = {
@@ -28,6 +29,7 @@ export class Player {
       container: config.container,
       direction: config.direction,
     });
+    this.peerid = config.peerid;
   }
 
   get playerSprite() {

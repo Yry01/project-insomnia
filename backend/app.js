@@ -3,9 +3,11 @@ import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import http from "http";
 import dotenv from "dotenv";
-import { createClient } from "redis";
+import redis from "redis";
 import sql from "mssql";
 import twilio from "twilio";
+import cors from "cors";
+import { ExpressPeerServer } from "peer";
 
 dotenv.config();
 
@@ -13,6 +15,7 @@ const PORT = process.env.PORT || 5000;
 export const app = express();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cors());
 
 // config for your database
 const config = {
@@ -52,12 +55,16 @@ app.post("/send-sms", (req, res) => {
 });
 
 // connect to redis
-const client = createClient({
-  password: process.env.REDIS_PASSWORD,
-  socket: {
-    host: process.env.REDIS_HOST,
-    port: process.env.REDIS_PORT,
-  },
+// const client = createClient({
+//   password: process.env.REDIS_PASSWORD,
+//   socket: {
+//     host: process.env.REDIS_HOST,
+//     port: process.env.REDIS_PORT,
+//   },
+// });
+
+const client = redis.createClient({
+  url: "redis://redis:6379",
 });
 
 client.on("error", (err) => console.log("Redis Client Error", err));
@@ -67,7 +74,7 @@ client.connect().then(() => console.log("Redis Client Connected"));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL,
+    origin: "*",
   },
 });
 
@@ -104,5 +111,26 @@ io.on("connection", (socket) => {
     });
   });
 });
+
+// peer server
+const peerServer = ExpressPeerServer(server, {
+  debug: true,
+  path: "/",
+  port: PORT,
+});
+
+app.use(
+  "/peerjs",
+  (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Methods", "GET, POST");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Content-Type, Authorization, Accept, X-Requested-With, Origin, Access-Control-Allow-Origin"
+    );
+    next();
+  },
+  peerServer
+);
 
 server.listen(PORT, () => console.log(`Server has started on port ${PORT}`));

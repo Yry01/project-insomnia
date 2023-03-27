@@ -7,6 +7,7 @@ import { CollisionsService } from '../../services/collisions.service';
 import { io } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
+import Peer, { MediaConnection } from 'peerjs';
 
 @Component({
   selector: 'app-chat-town',
@@ -30,6 +31,12 @@ export class ChatTownComponent implements OnInit {
   playerRef!: any;
   allPlayersRef!: any;
   allPlayers: { [key: string]: Player } = {};
+
+  //peer object
+  peer!: Peer;
+
+  // current calls
+  currentCalls: { [key: string]: MediaConnection } = {};
 
   // player skins
   skins = [
@@ -62,8 +69,10 @@ export class ChatTownComponent implements OnInit {
 
   ngOnInit(): void {
     const isAuthenticated = this.auth.isAuthenticated$;
-    isAuthenticated.subscribe((isAuth) => {
+    isAuthenticated.subscribe(async (isAuth) => {
       if (isAuth) {
+        this.peer = await this.createPeerConnection();
+        this.answerCall(this.peer);
         this.initGame();
       }
     });
@@ -126,6 +135,7 @@ export class ChatTownComponent implements OnInit {
       // notify new player joined the server
       this.socket.emit('player_joined', {
         id: id,
+        peerid: this.peer.id,
         skin: this.skins[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
@@ -172,6 +182,7 @@ export class ChatTownComponent implements OnInit {
       skin: player.skin,
       direction: player.direction,
       container: this.playersContainer,
+      peerid: player.peerid,
     });
     this.allPlayers[player.id] = newPlayer;
     this.loadOtherPlayers(player);
@@ -274,10 +285,139 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  createPeerConnection(): Promise<Peer> {
+    return new Promise((resolve) => {
+      this.peer = new Peer({
+        host: 'cscc09.insonmiachat.one',
+        port: 3000, // You can remove this line if using the default secure port (443)
+        path: '/peerjs',
+        secure: true,
+      });
+
+      this.peer.on('open', (id: string) => {
+        console.log('Connected to the signaling server. My ID:', id);
+        this.answerCall(this.peer); // Set up the event listener for incoming calls
+        resolve(this.peer); // Resolve the promise with the peer ID
+      });
+
+      this.peer.on('error', (error: any) => {
+        console.error('Error connecting to the signaling server:', error);
+      });
+    });
+  }
+
+  async getUserMediaStream(): Promise<MediaStream> {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      console.log('Got user media stream:', stream);
+      return stream;
+    } catch (error) {
+      console.error('Error getting user media:', error);
+      throw error;
+    }
+  }
+
+  async callUser(peer: Peer, targetPeerId: string) {
+    try {
+      if (this.currentCalls[targetPeerId]) {
+        console.log('A call is already active,skipping call to:', targetPeerId);
+        return;
+      }
+      const stream = await this.getUserMediaStream();
+      console.log('Calling user:', targetPeerId);
+      const call = peer.call(targetPeerId, stream);
+      console.log('call is: ', call);
+      call.on('stream', (remoteStream: MediaStream) => {
+        // Handle the remote stream (e.g., play it in an audio element)
+        console.log('audio should be playing in callUser');
+        this.playRemoteStream(remoteStream);
+      });
+      call.on('close', () => {
+        delete this.currentCalls[targetPeerId];
+      });
+      this.currentCalls[targetPeerId] = call;
+    } catch (error) {
+      console.error('Error calling user:', error);
+    }
+  }
+
+  hangUp() {
+    if (Object.keys(this.currentCalls).length > 0) {
+      for (const targetPeerId in this.currentCalls) {
+        if (this.currentCalls.hasOwnProperty(targetPeerId)) {
+          this.currentCalls[targetPeerId].close();
+          console.log(`Call with user ${targetPeerId} has been hung up.`);
+        }
+      }
+      this.currentCalls = {};
+    } else {
+      console.log('No calls are active to hang up.');
+    }
+  }
+
+  async callAllUsers() {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (Object.keys(this.allPlayers).length > 1) {
+      for (const player of Object.values(this.allPlayers)) {
+        if (player.id !== this.playerId) {
+          console.log(player.peerid);
+          await this.callUser(this.peer, player.peerid);
+        }
+      }
+    } else {
+      console.log('No other players in the room');
+    }
+  }
+
+  async answerCall(peer: Peer) {
+    peer.on('call', async (call: MediaConnection) => {
+      console.log('Call event triggered');
+      try {
+        console.log('Answering call:', call);
+        const stream = await this.getUserMediaStream();
+        console.log('stream is: ', stream);
+        call.answer(stream);
+        call.on('stream', (remoteStream: MediaStream) => {
+          // Handle the remote stream (e.g., play it in an audio element)
+          console.log('audio should be playing in answerCall');
+          this.playRemoteStream(remoteStream);
+        });
+      } catch (error) {
+        console.error('Error answering call:', error);
+      }
+    });
+  }
+
+  playRemoteStream(remoteStream: MediaStream) {
+    console.log('audio should be playing');
+    const audioElement = document.createElement('audio');
+    audioElement.srcObject = remoteStream;
+    audioElement.play();
+  }
+
+  callNearestUser() {
+    const mePlayer = this.allPlayers[this.playerId];
+    //check if there are other players in the room
+    if (Object.keys(this.allPlayers).length > 1) {
+      for (const player of Object.values(this.allPlayers)) {
+        if (player.id !== this.playerId) {
+          console.log(player.peerid);
+          this.callUser(this.peer, player.peerid);
+          break;
+        }
+      }
+    } else {
+      console.log('No other players in the room');
+    }
+  }
+
   keyPressListener() {
     new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
     new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
     new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
     new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
+    new KeyPressListener('KeyF', () => this.callNearestUser());
+    new KeyPressListener('KeyH', () => this.hangUp());
+    new KeyPressListener('KeyG', () => this.callAllUsers());
   }
 }
