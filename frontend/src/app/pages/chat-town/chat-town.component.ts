@@ -9,7 +9,6 @@ import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
 import Peer, { MediaConnection } from 'peerjs';
 
-
 @Component({
   selector: 'app-chat-town',
   templateUrl: './chat-town.component.html',
@@ -36,11 +35,8 @@ export class ChatTownComponent implements OnInit {
   //peer object
   peer!: Peer;
 
-
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
-
-
 
   // player skins
   skins = [
@@ -139,7 +135,7 @@ export class ChatTownComponent implements OnInit {
       // notify new player joined the server
       this.socket.emit('player_joined', {
         id: id,
-        peerid : this.peer.id,
+        peerid: this.peer.id,
         skin: this.skins[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
@@ -310,8 +306,6 @@ export class ChatTownComponent implements OnInit {
     });
   }
 
-
-
   async getUserMediaStream(): Promise<MediaStream> {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
@@ -332,10 +326,10 @@ export class ChatTownComponent implements OnInit {
       const stream = await this.getUserMediaStream();
       console.log('Calling user:', targetPeerId);
       const call = peer.call(targetPeerId, stream);
-      console.log("call is: ", call);
+      console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
         // Handle the remote stream (e.g., play it in an audio element)
-        console.log("audio should be playing in callUser");
+        console.log('audio should be playing in callUser');
         this.playRemoteStream(remoteStream);
       });
       call.on('close', () => {
@@ -361,7 +355,6 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
-
   async callAllUsers() {
     const mePlayer = this.allPlayers[this.playerId];
     if (Object.keys(this.allPlayers).length > 1) {
@@ -372,11 +365,9 @@ export class ChatTownComponent implements OnInit {
         }
       }
     } else {
-      console.log("No other players in the room");
+      console.log('No other players in the room');
     }
   }
-
-
 
   async answerCall(peer: Peer) {
     peer.on('call', async (call: MediaConnection) => {
@@ -384,11 +375,11 @@ export class ChatTownComponent implements OnInit {
       try {
         console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
-        console.log("stream is: ", stream);
+        console.log('stream is: ', stream);
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
           // Handle the remote stream (e.g., play it in an audio element)
-          console.log("audio should be playing in answerCall");
+          console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
         });
       } catch (error) {
@@ -398,7 +389,7 @@ export class ChatTownComponent implements OnInit {
   }
 
   playRemoteStream(remoteStream: MediaStream) {
-    console.log("audio should be playing");
+    console.log('audio should be playing');
     const audioElement = document.createElement('audio');
     audioElement.srcObject = remoteStream;
     audioElement.play();
@@ -408,21 +399,17 @@ export class ChatTownComponent implements OnInit {
     const mePlayer = this.allPlayers[this.playerId];
     //check if there are other players in the room
     if (Object.keys(this.allPlayers).length > 1) {
-      for(const player of Object.values(this.allPlayers)) {
+      for (const player of Object.values(this.allPlayers)) {
         if (player.id !== this.playerId) {
           console.log(player.peerid);
           this.callUser(this.peer, player.peerid);
           break;
         }
       }
+    } else {
+      console.log('No other players in the room');
     }
-    else{
-      console.log("No other players in the room");
-    }
-
   }
-
-
 
   keyPressListener() {
     new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
@@ -432,6 +419,5 @@ export class ChatTownComponent implements OnInit {
     new KeyPressListener('KeyF', () => this.callNearestUser());
     new KeyPressListener('KeyH', () => this.hangUp());
     new KeyPressListener('KeyG', () => this.callAllUsers());
-
   }
 }

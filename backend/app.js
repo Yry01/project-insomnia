@@ -74,7 +74,7 @@ client.connect().then(() => console.log("Redis Client Connected"));
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-	  origin: "*",
+    origin: "*",
   },
 });
 
@@ -111,7 +111,6 @@ io.on("connection", (socket) => {
     });
   });
 });
-
 
 // peer server
 const peerServer = ExpressPeerServer(server, {
