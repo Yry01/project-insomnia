@@ -36,6 +36,12 @@ export class ChatTownComponent implements OnInit {
   //peer object
   peer!: Peer;
 
+
+  // current calls
+  currentCalls: { [key: string]: MediaConnection } = {};
+
+
+
   // player skins
   skins = [
     '../assets/skins/davidmartinez.png',
@@ -319,6 +325,10 @@ export class ChatTownComponent implements OnInit {
 
   async callUser(peer: Peer, targetPeerId: string) {
     try {
+      if (this.currentCalls[targetPeerId]) {
+        console.log('A call is already active,skipping call to:', targetPeerId);
+        return;
+      }
       const stream = await this.getUserMediaStream();
       console.log('Calling user:', targetPeerId);
       const call = peer.call(targetPeerId, stream);
@@ -328,10 +338,45 @@ export class ChatTownComponent implements OnInit {
         console.log("audio should be playing in callUser");
         this.playRemoteStream(remoteStream);
       });
+      call.on('close', () => {
+        delete this.currentCalls[targetPeerId];
+      });
+      this.currentCalls[targetPeerId] = call;
     } catch (error) {
       console.error('Error calling user:', error);
     }
   }
+
+  hangUp() {
+    if (Object.keys(this.currentCalls).length > 0) {
+      for (const targetPeerId in this.currentCalls) {
+        if (this.currentCalls.hasOwnProperty(targetPeerId)) {
+          this.currentCalls[targetPeerId].close();
+          console.log(`Call with user ${targetPeerId} has been hung up.`);
+        }
+      }
+      this.currentCalls = {};
+    } else {
+      console.log('No calls are active to hang up.');
+    }
+  }
+
+
+  async callAllUsers() {
+    const mePlayer = this.allPlayers[this.playerId];
+    if (Object.keys(this.allPlayers).length > 1) {
+      for (const player of Object.values(this.allPlayers)) {
+        if (player.id !== this.playerId) {
+          console.log(player.peerid);
+          await this.callUser(this.peer, player.peerid);
+        }
+      }
+    } else {
+      console.log("No other players in the room");
+    }
+  }
+
+
 
   async answerCall(peer: Peer) {
     peer.on('call', async (call: MediaConnection) => {
@@ -385,5 +430,8 @@ export class ChatTownComponent implements OnInit {
     new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
     new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
     new KeyPressListener('KeyF', () => this.callNearestUser());
+    new KeyPressListener('KeyH', () => this.hangUp());
+    new KeyPressListener('KeyG', () => this.callAllUsers());
+
   }
 }
