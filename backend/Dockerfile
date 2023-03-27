@@ -15,8 +15,6 @@ COPY . .
 
 # Expose port 3000
 EXPOSE 3000
-EXPOSE 5000
-EXPOSE 3001
 
 # Start the server
 CMD ["npm", "start"]
