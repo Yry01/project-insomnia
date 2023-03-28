@@ -1,14 +1,16 @@
 <header>
-  <h3>Login page</h3>
+  <h3 class="grays">Welcome to Chat-Town!!!</h3>
+  <div *ngIf="auth.user$ | async as user">
+    <h3 class="grays">{{ user.email }}</h3>
+  </div>
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
-    <button class="btn btn-warning" (click)="auth.logout()">Log out</button>
-    <div *ngIf="auth.user$ | async as user">
-      <div>Welcome {{ user.email }}</div>
-    </div>
+    <button class="button-62" role="button" (click)="auth.logout()">
+      Log out
+    </button>
   </div>
 
   <ng-template #loggedOut>
-    <button class="btn btn-primary" (click)="auth.loginWithRedirect()">
+    <button class="button-62" role="button" (click)="auth.loginWithRedirect()">
       Log in
     </button>
   </ng-template>
