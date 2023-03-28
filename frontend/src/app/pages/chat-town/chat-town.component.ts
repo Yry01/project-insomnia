@@ -28,8 +28,6 @@ export class ChatTownComponent implements OnInit {
 
   // player objects
   playerId!: string;
-  playerRef!: any;
-  allPlayersRef!: any;
   allPlayers: { [key: string]: Player } = {};
 
   //peer object
@@ -40,6 +38,9 @@ export class ChatTownComponent implements OnInit {
 
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
+
+  // keyboard controls
+  keys: { [key: string]: boolean } = {};
 
   // player skins
   skins = [
@@ -413,22 +414,6 @@ export class ChatTownComponent implements OnInit {
     audioElement.play();
   }
 
-  // callNearestUser() {
-  //   const mePlayer = this.allPlayers[this.playerId];
-  //   //check if there are other players in the room
-  //   if (Object.keys(this.allPlayers).length > 1) {
-  //     for (const player of Object.values(this.allPlayers)) {
-  //       if (player.id !== this.playerId) {
-  //         console.log(player.peerid);
-  //         this.callUser(this.peer, player.peerid);
-  //         break;
-  //       }
-  //     }
-  //   } else {
-  //     console.log('No other players in the room');
-  //   }
-  // }
-
   toggleMute() {
     this.isMuted = !this.isMuted;
 
@@ -444,13 +429,39 @@ export class ChatTownComponent implements OnInit {
   }
 
   keyPressListener() {
-    new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
-    new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
-    new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
-    new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
-    // new KeyPressListener('KeyF', () => this.callNearestUser());
+    this.onMovementKeys();
+    
     new KeyPressListener('KeyH', () => this.hangUp());
     new KeyPressListener('KeyG', () => this.callAllUsers());
     new KeyPressListener('KeyM', () => this.toggleMute());
+  }
+
+  onMovementKeys() {
+    document.addEventListener('keydown', (event) => {
+      this.keys[event.key] = true;
+    });
+
+    document.addEventListener('keyup', (event) => {
+      this.keys[event.key] = false;
+    });
+
+    // key pressed
+    setInterval(() => {
+      if (this.keys['w'] == true) {
+        this.handleArrowPress('up');
+      }
+
+      if (this.keys['a'] == true) {
+        this.handleArrowPress('left');
+      }
+
+      if (this.keys['s'] == true) {
+        this.handleArrowPress('down');
+      }
+
+      if (this.keys['d'] == true) {
+        this.handleArrowPress('right');
+      }
+    }, 1000 / 30);
   }
 }

@@ -3,9 +3,7 @@ import bodyParser from "body-parser";
 import { Server } from "socket.io";
 import http from "http";
 import dotenv from "dotenv";
-import redis from "redis";
-import sql from "mssql";
-import twilio from "twilio";
+import { createClient } from "redis";
 import cors from "cors";
 import { ExpressPeerServer } from "peer";
 
@@ -17,54 +15,8 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cors());
 
-// config for your database
-const config = {
-  user: "CloudSA4069d47d",
-  password: "yuerunyu1.",
-  server: "chat-town.database.windows.net",
-  database: "chat-town",
-  options: {
-    encrypt: true,
-    enableArithAbort: true,
-  },
-};
-
-// connect to your database
-sql.connect(config, function (err) {
-  if (err) console.log(err);
-  else console.log("Database connected");
-});
-
-app.post("/send-sms", (req, res) => {
-  const accountSid = "AC662c7db6285d6b82a91d93d37a8ab278";
-  const authToken = "0f444eb16079fadab4a282c6297ea813";
-  const client = twilio(accountSid, authToken);
-
-  const { to, body } = req.body;
-
-  client.messages
-    .create({
-      body: body,
-      from: "+15075805415",
-      to: to,
-    })
-    .then((message) => res.status(200).json({ message: "SMS sent!" }))
-    .catch((err) => {
-      res.status(500).json({ message: "Something went wrong" });
-    });
-});
-
-// connect to redis
-// const client = createClient({
-//   password: process.env.REDIS_PASSWORD,
-//   socket: {
-//     host: process.env.REDIS_HOST,
-//     port: process.env.REDIS_PORT,
-//   },
-// });
-
-const client = redis.createClient({
-  url: "redis://redis:6379",
+const client = createClient({
+  url: process.env.REDIS_URL,
 });
 
 client.on("error", (err) => console.log("Redis Client Error", err));
@@ -106,11 +58,15 @@ io.on("connection", (socket) => {
   // player Moved
   socket.on("player_moved", (player) => {
     client.hSet("players", player.id, JSON.stringify(player));
-    client.hGetAll("players").then((players) => {
-      io.sockets.emit("player_moved", players);
-    });
   });
 });
+
+// broadcast players position every 60fps
+setInterval(() => {
+  client.hGetAll("players").then((players) => {
+    io.sockets.emit("player_moved", players);
+  });
+}, 1000 / 60);
 
 // peer server
 const peerServer = ExpressPeerServer(server, {
