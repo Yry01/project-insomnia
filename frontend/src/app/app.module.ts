@@ -6,12 +6,9 @@ import { AppComponent } from './app.component';
 
 import { AngularFireDatabaseModule } from '@angular/fire/compat/database';
 import { ChatTownComponent } from './pages/chat-town/chat-town.component';
-import { LoginComponent } from './pages/login/login.component';
 import { AuthModule } from '@auth0/auth0-angular';
-import { TwilioComponent } from './pages/twilio/twilio.component';
 import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
-import { TestComponent } from './pages/test-component/test-component.component';
 
 import { environment } from '../environments/environment';
 
@@ -19,9 +16,6 @@ import { environment } from '../environments/environment';
   declarations: [
     AppComponent,
     ChatTownComponent,
-    LoginComponent,
-    TwilioComponent,
-    TestComponent,
   ],
   imports: [
     BrowserModule,

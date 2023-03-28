@@ -15,7 +15,7 @@ export class KeyPressListener {
   keydownFunction = (event: KeyboardEvent) => {
     if (event.code === this.keyCode) {
       if (this.keySafe) {
-        //this.keySafe = false;
+        this.keySafe = false;
         this.callback();
       }
     }

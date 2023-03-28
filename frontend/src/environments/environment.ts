@@ -1,5 +1,5 @@
 export const environment = {
-  production: false,
+  production: true,
   backendUrl: 'https://cscc09.insonmiachat.one:3000',
   auth: {
     domain: 'dev-hpc5hctabd1e0xhl.us.auth0.com',
