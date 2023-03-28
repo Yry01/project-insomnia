@@ -35,6 +35,9 @@ export class ChatTownComponent implements OnInit {
   //peer object
   peer!: Peer;
 
+  //ismuted
+  isMuted = false;
+
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
 
@@ -375,6 +378,11 @@ export class ChatTownComponent implements OnInit {
       try {
         console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
+        if (this.isMuted) {
+          stream.getAudioTracks().forEach((track) => {
+            track.enabled = false;
+          });
+        }
         console.log('stream is: ', stream);
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
@@ -405,29 +413,48 @@ export class ChatTownComponent implements OnInit {
     audioElement.play();
   }
 
-  callNearestUser() {
-    const mePlayer = this.allPlayers[this.playerId];
-    //check if there are other players in the room
-    if (Object.keys(this.allPlayers).length > 1) {
-      for (const player of Object.values(this.allPlayers)) {
-        if (player.id !== this.playerId) {
-          console.log(player.peerid);
-          this.callUser(this.peer, player.peerid);
-          break;
+  // callNearestUser() {
+  //   const mePlayer = this.allPlayers[this.playerId];
+  //   //check if there are other players in the room
+  //   if (Object.keys(this.allPlayers).length > 1) {
+  //     for (const player of Object.values(this.allPlayers)) {
+  //       if (player.id !== this.playerId) {
+  //         console.log(player.peerid);
+  //         this.callUser(this.peer, player.peerid);
+  //         break;
+  //       }
+  //     }
+  //   } else {
+  //     console.log('No other players in the room');
+  //   }
+  // }
+
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+
+    for (const key in this.currentCalls) {
+      const call = this.currentCalls[key];
+      // mute this player's audio based on the isMuted state
+      call.peerConnection.getSenders().forEach((sender) => {
+        if (sender.track&&sender.track.kind === 'audio') {
+          sender.track.enabled = !this.isMuted;
         }
       }
-    } else {
-      console.log('No other players in the room');
+      );
     }
   }
+
+
+
 
   keyPressListener() {
     new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
     new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
     new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
     new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
-    new KeyPressListener('KeyF', () => this.callNearestUser());
+    // new KeyPressListener('KeyF', () => this.callNearestUser());
     new KeyPressListener('KeyH', () => this.hangUp());
     new KeyPressListener('KeyG', () => this.callAllUsers());
+    new KeyPressListener('KeyM', () => this.toggleMute());
   }
 }
