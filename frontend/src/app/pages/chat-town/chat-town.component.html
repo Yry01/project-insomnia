@@ -1,12 +1,12 @@
 <header>
   <h3 class="grays">Welcome to Chat-Town!!!</h3>
+  <div *ngIf="auth.user$ | async as user">
+    <h3 class="grays">{{ user.email }}</h3>
+  </div>
   <div *ngIf="auth.isAuthenticated$ | async; else loggedOut">
     <button class="button-62" role="button" (click)="auth.logout()">
       Log out
     </button>
-    <div *ngIf="auth.user$ | async as user">
-      <div>Welcome {{ user.email }}</div>
-    </div>
   </div>
 
   <ng-template #loggedOut>
