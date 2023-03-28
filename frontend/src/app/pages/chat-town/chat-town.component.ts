@@ -436,16 +436,12 @@ export class ChatTownComponent implements OnInit {
       const call = this.currentCalls[key];
       // mute this player's audio based on the isMuted state
       call.peerConnection.getSenders().forEach((sender) => {
-        if (sender.track&&sender.track.kind === 'audio') {
+        if (sender.track && sender.track.kind === 'audio') {
           sender.track.enabled = !this.isMuted;
         }
-      }
-      );
+      });
     }
   }
-
-
-
 
   keyPressListener() {
     new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
