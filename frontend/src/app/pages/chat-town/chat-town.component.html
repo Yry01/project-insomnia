@@ -2,7 +2,7 @@
   <h3 class="grays">Welcome to Chat-Town!!!</h3>
   <div *ngIf="auth.user$ | async as user">
     <div class="welcome-message">
-      <h3 class="grays in-welcome">Hi {{user.email}}</h3>
+      <h3 class="grays in-welcome">Hi {{ user.email }}</h3>
       <div class="mint in-welcome">
         Please press: G to call everyone in the chat-town.
       </div>
