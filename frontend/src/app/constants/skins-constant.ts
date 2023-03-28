@@ -1,0 +1,18 @@
+export const SKINS = [
+  '../assets/skins/davidmartinez.png',
+  '../assets/skins/dorio.png',
+  '../assets/skins/faraday.png',
+  '../assets/skins/johnny.png',
+  '../assets/skins/judy.png',
+  '../assets/skins/judyscuba.png',
+  '../assets/skins/kiwi.png',
+  '../assets/skins/lucy.png',
+  '../assets/skins/maine.png',
+  '../assets/skins/rebecca.png',
+  '../assets/skins/river.png',
+  '../assets/skins/riverjacket.png',
+  '../assets/skins/roguejacket.png',
+  '../assets/skins/takemura.png',
+  '../assets/skins/takemurajacket.png',
+  '../assets/skins/tbug.png',
+];

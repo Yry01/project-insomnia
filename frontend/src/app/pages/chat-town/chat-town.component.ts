@@ -8,6 +8,7 @@ import { io } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
 import Peer, { MediaConnection } from 'peerjs';
+import { SKINS } from 'src/app/constants/skins-constant';
 
 @Component({
   selector: 'app-chat-town',
@@ -41,26 +42,6 @@ export class ChatTownComponent implements OnInit {
 
   // keyboard controls
   keys: { [key: string]: boolean } = {};
-
-  // player skins
-  skins = [
-    '../assets/skins/davidmartinez.png',
-    '../assets/skins/dorio.png',
-    '../assets/skins/faraday.png',
-    '../assets/skins/johnny.png',
-    '../assets/skins/judy.png',
-    '../assets/skins/judyscuba.png',
-    '../assets/skins/kiwi.png',
-    '../assets/skins/lucy.png',
-    '../assets/skins/maine.png',
-    '../assets/skins/rebecca.png',
-    '../assets/skins/river.png',
-    '../assets/skins/riverjacket.png',
-    '../assets/skins/roguejacket.png',
-    '../assets/skins/takemura.png',
-    '../assets/skins/takemurajacket.png',
-    '../assets/skins/tbug.png',
-  ];
 
   // socket.io
   socket: any;
@@ -140,7 +121,7 @@ export class ChatTownComponent implements OnInit {
       this.socket.emit('player_joined', {
         id: id,
         peerid: this.peer.id,
-        skin: this.skins[Math.floor(Math.random() * 15)],
+        skin: SKINS[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
         y: this.Utils.withGrid(22),
@@ -168,7 +149,6 @@ export class ChatTownComponent implements OnInit {
         player = JSON.parse(player);
         this.loadOtherPlayers(player);
       });
-      this.renderMap();
     });
 
     this.socket.on('player_disconnected', (playerId: string) => {
@@ -265,6 +245,12 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  renderPlayers() {
+    Object.values(this.allPlayers).forEach((player: any) => {
+      this.loadOtherPlayers(player);
+    });
+  }
+
   handleArrowPress(direction: string) {
     const mePlayer = this.allPlayers[this.playerId];
     if (!this.Collisions.checkCollisions(mePlayer, direction)) {
@@ -284,6 +270,8 @@ export class ChatTownComponent implements OnInit {
         direction: mePlayer.direction,
         skin: mePlayer.skin,
       });
+      this.renderMap();
+      this.renderPlayers();
     } else {
       mePlayer.playAnimation(direction);
     }
@@ -292,10 +280,10 @@ export class ChatTownComponent implements OnInit {
   createPeerConnection(): Promise<Peer> {
     return new Promise((resolve) => {
       this.peer = new Peer({
-        host: 'cscc09.insonmiachat.one',
-        port: 3000, // You can remove this line if using the default secure port (443)
+        host: environment.peerjsHost,
+        port: environment.peerjsPort, // You can remove this line if using the default secure port (443)
         path: '/peerjs',
-        secure: true,
+        secure: environment.peerjsSecure,
       });
 
       this.peer.on('open', (id: string) => {
@@ -360,7 +348,6 @@ export class ChatTownComponent implements OnInit {
   }
 
   async callAllUsers() {
-    const mePlayer = this.allPlayers[this.playerId];
     if (Object.keys(this.allPlayers).length > 1) {
       for (const player of Object.values(this.allPlayers)) {
         if (player.id !== this.playerId) {
@@ -430,7 +417,7 @@ export class ChatTownComponent implements OnInit {
 
   keyPressListener() {
     this.onMovementKeys();
-    
+
     new KeyPressListener('KeyH', () => this.hangUp());
     new KeyPressListener('KeyG', () => this.callAllUsers());
     new KeyPressListener('KeyM', () => this.toggleMute());

@@ -8,4 +8,8 @@ export const environment = {
       redirect_uri: window.location.origin,
     },
   },
+
+  peerjsPort: 3000,
+  peerjsHost: 'localhost',
+  peerjsSecure: false,
 };
