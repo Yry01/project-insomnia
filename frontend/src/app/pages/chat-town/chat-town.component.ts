@@ -150,6 +150,7 @@ export class ChatTownComponent implements OnInit {
     this.socket.on('player_moved', (players: any) => {
       Object.values(players).forEach((player: any) => {
         player = JSON.parse(player);
+        if (player.id === this.playerId) return;
         this.loadOtherPlayers(player);
       });
     });
@@ -272,6 +273,7 @@ export class ChatTownComponent implements OnInit {
         y: mePlayer.y,
         direction: mePlayer.direction,
         skin: mePlayer.skin,
+        peerid: mePlayer.peerid,
       });
       this.renderMap();
       this.renderPlayers();
