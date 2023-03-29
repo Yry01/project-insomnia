@@ -37,6 +37,9 @@ export class ChatTownComponent implements OnInit {
   //ismuted
   isMuted = false;
 
+  //isInCall
+  isInCall = false;
+
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
 
@@ -320,11 +323,13 @@ export class ChatTownComponent implements OnInit {
       const call = peer.call(targetPeerId, stream);
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
+        this.isInCall = true;
         // Handle the remote stream (e.g., play it in an audio element)
         console.log('audio should be playing in callUser');
         this.playRemoteStream(remoteStream);
       });
       call.on('close', () => {
+        this.isInCall = false;
         delete this.currentCalls[targetPeerId];
       });
       this.currentCalls[targetPeerId] = call;
@@ -374,12 +379,14 @@ export class ChatTownComponent implements OnInit {
         console.log('stream is: ', stream);
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
+          this.isInCall = true;
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
         });
         // Handle call close event
         call.on('close', () => {
+          this.isInCall = false;
           console.log(
             `Call with user ${call.peer} has been hung up by receiver.`
           );
