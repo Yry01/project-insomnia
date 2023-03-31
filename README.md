@@ -10,6 +10,12 @@ Runyu Yue：1007391298
 
 Xu Zheng: 1006330132
 
+## Website
+https://cscc09.insonmiachat.one/
+
+## Project video
+https://youtu.be/v72StNEfVLg
+
 ## Web application description
 
 Our web application is a virtual space that allows people to gather and interact with each other in a fun and engaging way. Our application is designed to recreate the experience of being in a physical space, with different areas, objects, and activities to explore.
