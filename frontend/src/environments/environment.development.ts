@@ -1,11 +1,15 @@
 export const environment = {
-  production: true,
-  backendUrl: 'https://cscc09.insonmiachat.one:3000',
+  production: false,
+  backendUrl: 'http://localhost:3000',
   auth: {
     domain: 'dev-hpc5hctabd1e0xhl.us.auth0.com',
     clientId: 'yTAS8N2p5Nog3fAxbQ5uuzbborxoSv3e',
     authorizationParams: {
-      redirect_uri: 'http://localhost:80',
+      redirect_uri: window.location.origin,
     },
   },
+
+  peerjsPort: 3000,
+  peerjsHost: 'localhost',
+  peerjsSecure: false,
 };

@@ -8,6 +8,7 @@ import { io } from 'socket.io-client';
 import { environment } from '../../../environments/environment';
 import { AuthService } from '@auth0/auth0-angular';
 import Peer, { MediaConnection } from 'peerjs';
+import { SKINS } from 'src/app/constants/skins-constant';
 
 @Component({
   selector: 'app-chat-town',
@@ -28,35 +29,22 @@ export class ChatTownComponent implements OnInit {
 
   // player objects
   playerId!: string;
-  playerRef!: any;
-  allPlayersRef!: any;
   allPlayers: { [key: string]: Player } = {};
 
   //peer object
   peer!: Peer;
 
+  //ismuted
+  isMuted = false;
+
+  //isInCall
+  isInCall = false;
+
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
 
-  // player skins
-  skins = [
-    '../assets/skins/davidmartinez.png',
-    '../assets/skins/dorio.png',
-    '../assets/skins/faraday.png',
-    '../assets/skins/johnny.png',
-    '../assets/skins/judy.png',
-    '../assets/skins/judyscuba.png',
-    '../assets/skins/kiwi.png',
-    '../assets/skins/lucy.png',
-    '../assets/skins/maine.png',
-    '../assets/skins/rebecca.png',
-    '../assets/skins/river.png',
-    '../assets/skins/riverjacket.png',
-    '../assets/skins/roguejacket.png',
-    '../assets/skins/takemura.png',
-    '../assets/skins/takemurajacket.png',
-    '../assets/skins/tbug.png',
-  ];
+  // keyboard controls
+  keys: { [key: string]: boolean } = {};
 
   // socket.io
   socket: any;
@@ -136,7 +124,7 @@ export class ChatTownComponent implements OnInit {
       this.socket.emit('player_joined', {
         id: id,
         peerid: this.peer.id,
-        skin: this.skins[Math.floor(Math.random() * 15)],
+        skin: SKINS[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
         y: this.Utils.withGrid(22),
@@ -162,9 +150,9 @@ export class ChatTownComponent implements OnInit {
     this.socket.on('player_moved', (players: any) => {
       Object.values(players).forEach((player: any) => {
         player = JSON.parse(player);
+        if (player.id === this.playerId) return;
         this.loadOtherPlayers(player);
       });
-      this.renderMap();
     });
 
     this.socket.on('player_disconnected', (playerId: string) => {
@@ -189,6 +177,7 @@ export class ChatTownComponent implements OnInit {
   }
 
   loadOtherPlayers(player: any) {
+    if (this.allPlayers[player.id] === undefined) return;
     if (this.allPlayers[player.id].isSpriteLoaded === false) {
       setTimeout(() => {
         this.loadOtherPlayers(player);
@@ -261,6 +250,12 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  renderPlayers() {
+    Object.values(this.allPlayers).forEach((player: any) => {
+      this.loadOtherPlayers(player);
+    });
+  }
+
   handleArrowPress(direction: string) {
     const mePlayer = this.allPlayers[this.playerId];
     if (!this.Collisions.checkCollisions(mePlayer, direction)) {
@@ -279,7 +274,10 @@ export class ChatTownComponent implements OnInit {
         y: mePlayer.y,
         direction: mePlayer.direction,
         skin: mePlayer.skin,
+        peerid: mePlayer.peerid,
       });
+      this.renderMap();
+      this.renderPlayers();
     } else {
       mePlayer.playAnimation(direction);
     }
@@ -288,10 +286,10 @@ export class ChatTownComponent implements OnInit {
   createPeerConnection(): Promise<Peer> {
     return new Promise((resolve) => {
       this.peer = new Peer({
-        host: 'cscc09.insonmiachat.one',
-        port: 3000, // You can remove this line if using the default secure port (443)
+        host: environment.peerjsHost,
+        port: environment.peerjsPort, // You can remove this line if using the default secure port (443)
         path: '/peerjs',
-        secure: true,
+        secure: environment.peerjsSecure,
       });
 
       this.peer.on('open', (id: string) => {
@@ -328,11 +326,13 @@ export class ChatTownComponent implements OnInit {
       const call = peer.call(targetPeerId, stream);
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
+        this.isInCall = true;
         // Handle the remote stream (e.g., play it in an audio element)
         console.log('audio should be playing in callUser');
         this.playRemoteStream(remoteStream);
       });
       call.on('close', () => {
+        this.isInCall = false;
         delete this.currentCalls[targetPeerId];
       });
       this.currentCalls[targetPeerId] = call;
@@ -356,7 +356,6 @@ export class ChatTownComponent implements OnInit {
   }
 
   async callAllUsers() {
-    const mePlayer = this.allPlayers[this.playerId];
     if (Object.keys(this.allPlayers).length > 1) {
       for (const player of Object.values(this.allPlayers)) {
         if (player.id !== this.playerId) {
@@ -375,13 +374,30 @@ export class ChatTownComponent implements OnInit {
       try {
         console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
+        if (this.isMuted) {
+          stream.getAudioTracks().forEach((track) => {
+            track.enabled = false;
+          });
+        }
         console.log('stream is: ', stream);
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
+          this.isInCall = true;
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
         });
+        // Handle call close event
+        call.on('close', () => {
+          this.isInCall = false;
+          console.log(
+            `Call with user ${call.peer} has been hung up by receiver.`
+          );
+          delete this.currentCalls[call.peer];
+        });
+
+        // Store the call in the currentCalls object
+        this.currentCalls[call.peer] = call;
       } catch (error) {
         console.error('Error answering call:', error);
       }
@@ -395,29 +411,54 @@ export class ChatTownComponent implements OnInit {
     audioElement.play();
   }
 
-  callNearestUser() {
-    const mePlayer = this.allPlayers[this.playerId];
-    //check if there are other players in the room
-    if (Object.keys(this.allPlayers).length > 1) {
-      for (const player of Object.values(this.allPlayers)) {
-        if (player.id !== this.playerId) {
-          console.log(player.peerid);
-          this.callUser(this.peer, player.peerid);
-          break;
+  toggleMute() {
+    this.isMuted = !this.isMuted;
+
+    for (const key in this.currentCalls) {
+      const call = this.currentCalls[key];
+      // mute this player's audio based on the isMuted state
+      call.peerConnection.getSenders().forEach((sender) => {
+        if (sender.track && sender.track.kind === 'audio') {
+          sender.track.enabled = !this.isMuted;
         }
-      }
-    } else {
-      console.log('No other players in the room');
+      });
     }
   }
 
   keyPressListener() {
-    new KeyPressListener('KeyW', () => this.handleArrowPress('up'));
-    new KeyPressListener('KeyS', () => this.handleArrowPress('down'));
-    new KeyPressListener('KeyA', () => this.handleArrowPress('left'));
-    new KeyPressListener('KeyD', () => this.handleArrowPress('right'));
-    new KeyPressListener('KeyF', () => this.callNearestUser());
+    this.onMovementKeys();
+
     new KeyPressListener('KeyH', () => this.hangUp());
     new KeyPressListener('KeyG', () => this.callAllUsers());
+    new KeyPressListener('KeyM', () => this.toggleMute());
+  }
+
+  onMovementKeys() {
+    document.addEventListener('keydown', (event) => {
+      this.keys[event.key] = true;
+    });
+
+    document.addEventListener('keyup', (event) => {
+      this.keys[event.key] = false;
+    });
+
+    // key pressed
+    setInterval(() => {
+      if (this.keys['w'] == true) {
+        this.handleArrowPress('up');
+      }
+
+      if (this.keys['a'] == true) {
+        this.handleArrowPress('left');
+      }
+
+      if (this.keys['s'] == true) {
+        this.handleArrowPress('down');
+      }
+
+      if (this.keys['d'] == true) {
+        this.handleArrowPress('right');
+      }
+    }, 1000 / 30);
   }
 }
