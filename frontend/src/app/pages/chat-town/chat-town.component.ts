@@ -177,7 +177,7 @@ export class ChatTownComponent implements OnInit {
   }
 
   loadOtherPlayers(player: any) {
-    if (this.allPlayers[player.id] === undefined) return
+    if (this.allPlayers[player.id] === undefined) return;
     if (this.allPlayers[player.id].isSpriteLoaded === false) {
       setTimeout(() => {
         this.loadOtherPlayers(player);
