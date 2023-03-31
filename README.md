@@ -55,5 +55,5 @@ Overall, our web application provides a unique and immersive way of connecting w
 
 ### Final version
 
-- perrjs
+- peerjs
   - User can communicate with other users using audio
