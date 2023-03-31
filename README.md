@@ -54,6 +54,4 @@ Overall, our web application provides a unique and immersive way of connecting w
 ### Final version
 
 - perrjs
-  - User can text with other users
-- web audio
-  - User can talk to other users
+  - User can communicate with other users using audio
