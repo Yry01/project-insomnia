@@ -43,6 +43,9 @@ export class ChatTownComponent implements OnInit {
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
 
+  //istalking
+  isTalking = false;
+
   // keyboard controls
   keys: { [key: string]: boolean } = {};
 
@@ -323,16 +326,19 @@ export class ChatTownComponent implements OnInit {
       }
       const stream = await this.getUserMediaStream();
       console.log('Calling user:', targetPeerId);
+      await this.checkIsTalking(stream);
       const call = peer.call(targetPeerId, stream);
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
         this.isInCall = true;
+        console.log('is in call: ', this.isInCall);
         // Handle the remote stream (e.g., play it in an audio element)
         console.log('audio should be playing in callUser');
         this.playRemoteStream(remoteStream);
       });
       call.on('close', () => {
         this.isInCall = false;
+        console.log('is in call: ', this.isInCall);
         delete this.currentCalls[targetPeerId];
       });
       this.currentCalls[targetPeerId] = call;
@@ -355,6 +361,36 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  async checkIsTalking(stream: MediaStream) {
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    analyser.fftSize = 2048;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const checkAudioLevels = () => {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+
+      // Set a threshold for when the user is considered to be talking
+      const threshold = 10;
+
+      if (average > threshold) {
+        this.isTalking = true;
+      } else {
+        this.isTalking = false;
+      }
+
+      // Check the audio levels every 100 milliseconds
+      setTimeout(() => checkAudioLevels(), 100);
+      console.log('is talking: ', this.isTalking);
+    };
+
+    checkAudioLevels();
+  }
+
   async callAllUsers() {
     if (Object.keys(this.allPlayers).length > 1) {
       for (const player of Object.values(this.allPlayers)) {
@@ -374,6 +410,7 @@ export class ChatTownComponent implements OnInit {
       try {
         console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
+        await this.checkIsTalking(stream);
         if (this.isMuted) {
           stream.getAudioTracks().forEach((track) => {
             track.enabled = false;
@@ -383,6 +420,7 @@ export class ChatTownComponent implements OnInit {
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
           this.isInCall = true;
+          console.log('is in call: ', this.isInCall);
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
@@ -390,6 +428,7 @@ export class ChatTownComponent implements OnInit {
         // Handle call close event
         call.on('close', () => {
           this.isInCall = false;
+          console.log('is in call: ', this.isInCall);
           console.log(
             `Call with user ${call.peer} has been hung up by receiver.`
           );
