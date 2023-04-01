@@ -351,6 +351,14 @@ export class ChatTownComponent implements OnInit {
       });
       call.on('close', () => {
         this.isInCall = false;
+        // add the hidden class of hang-up and mute
+        const hangUp = document.getElementById('hang-up');
+        const mute = document.getElementById('mute');
+        hangUp?.classList.add('hidden');
+        mute?.classList.add('hidden');
+        // remove the hidden to call class
+        const callUser = document.getElementById('call-user');
+        callUser?.classList.remove('hidden');
         console.log('is in call: ', this.isInCall);
         delete this.currentCalls[targetPeerId];
       });
@@ -398,7 +406,7 @@ export class ChatTownComponent implements OnInit {
 
       // Check the audio levels every 100 milliseconds
       setTimeout(() => checkAudioLevels(), 100);
-      console.log('is talking: ', this.isTalking);
+      // console.log('is talking: ', this.isTalking);
     };
 
     checkAudioLevels();
@@ -433,6 +441,14 @@ export class ChatTownComponent implements OnInit {
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
           this.isInCall = true;
+          //remove the hidden class of hang-up and mute
+          const hangUp = document.getElementById('hang-up');
+          const mute = document.getElementById('mute');
+          hangUp?.classList.remove('hidden');
+          mute?.classList.remove('hidden');
+          // add the hidden to call class
+          const callUser = document.getElementById('call-user');
+          callUser?.classList.add('hidden');
           console.log('is in call: ', this.isInCall);
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
@@ -441,6 +457,13 @@ export class ChatTownComponent implements OnInit {
         // Handle call close event
         call.on('close', () => {
           this.isInCall = false;
+          const hangUp = document.getElementById('hang-up');
+          const mute = document.getElementById('mute');
+          hangUp?.classList.add('hidden');
+          mute?.classList.add('hidden');
+          // remove the hidden to call class
+          const callUser = document.getElementById('call-user');
+          callUser?.classList.remove('hidden');
           console.log('is in call: ', this.isInCall);
           console.log(
             `Call with user ${call.peer} has been hung up by receiver.`
