@@ -70,6 +70,11 @@ export class ChatTownComponent implements OnInit {
   }
 
   initGame() {
+    //add hidden class to hung-up and mute
+    const mute = document.getElementById('mute');
+    const hangUp = document.getElementById('hang-up');
+    mute?.classList.add('hidden');
+    hangUp?.classList.add('hidden');
     // initialize the game canvas
     this.app = new PIXI.Application({
       view: document.getElementById('game-canvas') as HTMLCanvasElement,
@@ -331,6 +336,14 @@ export class ChatTownComponent implements OnInit {
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
         this.isInCall = true;
+        //remove the hidden class of hang-up and mute
+        const hangUp = document.getElementById('hang-up');
+        const mute = document.getElementById('mute');
+        hangUp?.classList.remove('hidden');
+        mute?.classList.remove('hidden');
+        // add the hidden to call class
+        const callUser = document.getElementById('call-user');
+        callUser?.classList.add('hidden');
         console.log('is in call: ', this.isInCall);
         // Handle the remote stream (e.g., play it in an audio element)
         console.log('audio should be playing in callUser');
