@@ -43,6 +43,9 @@ export class ChatTownComponent implements OnInit {
   // current calls
   currentCalls: { [key: string]: MediaConnection } = {};
 
+  //istalking
+  isTalking = false;
+
   // keyboard controls
   keys: { [key: string]: boolean } = {};
 
@@ -323,16 +326,48 @@ export class ChatTownComponent implements OnInit {
       }
       const stream = await this.getUserMediaStream();
       console.log('Calling user:', targetPeerId);
+      await this.checkIsTalking(stream);
       const call = peer.call(targetPeerId, stream);
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
         this.isInCall = true;
+        //remove the hidden class of hang-up and mute and icons
+        const hangUp = document.getElementById('hang-up');
+        const mute = document.getElementById('mute');
+        const icons = document.getElementById('icons');
+        hangUp?.classList.remove('hidden');
+        mute?.classList.remove('hidden');
+        icons?.classList.remove('hidden');
+        const micOn = document.getElementById('mic-on');
+        const micOff = document.getElementById('mic-off');
+        if (this.isMuted) {
+          micOn?.classList.add('hidden');
+          micOff?.classList.remove('hidden');
+        } else {
+          micOff?.classList.add('hidden');
+          micOn?.classList.remove('hidden');
+        }
+        // add the hidden to call class
+        const callUser = document.getElementById('call-user');
+        callUser?.classList.add('hidden');
+        console.log('is in call: ', this.isInCall);
         // Handle the remote stream (e.g., play it in an audio element)
         console.log('audio should be playing in callUser');
         this.playRemoteStream(remoteStream);
       });
       call.on('close', () => {
         this.isInCall = false;
+        // add the hidden class of hang-up and mute
+        const hangUp = document.getElementById('hang-up');
+        const mute = document.getElementById('mute');
+        const icons = document.getElementById('icons');
+        hangUp?.classList.add('hidden');
+        mute?.classList.add('hidden');
+        icons?.classList.add('hidden');
+        // remove the hidden to call class
+        const callUser = document.getElementById('call-user');
+        callUser?.classList.remove('hidden');
+        console.log('is in call: ', this.isInCall);
         delete this.currentCalls[targetPeerId];
       });
       this.currentCalls[targetPeerId] = call;
@@ -355,6 +390,43 @@ export class ChatTownComponent implements OnInit {
     }
   }
 
+  async checkIsTalking(stream: MediaStream) {
+    const audioContext = new AudioContext();
+    const analyser = audioContext.createAnalyser();
+    const source = audioContext.createMediaStreamSource(stream);
+    source.connect(analyser);
+    analyser.fftSize = 2048;
+    const bufferLength = analyser.frequencyBinCount;
+    const dataArray = new Uint8Array(bufferLength);
+
+    const checkAudioLevels = () => {
+      analyser.getByteFrequencyData(dataArray);
+      const average = dataArray.reduce((a, b) => a + b) / bufferLength;
+
+      // Set a threshold for when the user is considered to be talking
+      const threshold = 10;
+
+      const vol = document.getElementById('vol');
+      if (average > threshold) {
+        this.isTalking = true;
+        if (!this.isMuted && this.isInCall) {
+          vol?.classList.remove('hidden');
+        } else {
+          vol?.classList.add('hidden');
+        }
+      } else {
+        this.isTalking = false;
+        vol?.classList.add('hidden');
+      }
+
+      // Check the audio levels every 100 milliseconds
+      setTimeout(() => checkAudioLevels(), 100);
+      // console.log('is talking: ', this.isTalking);
+    };
+
+    checkAudioLevels();
+  }
+
   async callAllUsers() {
     if (Object.keys(this.allPlayers).length > 1) {
       for (const player of Object.values(this.allPlayers)) {
@@ -374,6 +446,7 @@ export class ChatTownComponent implements OnInit {
       try {
         console.log('Answering call:', call);
         const stream = await this.getUserMediaStream();
+        await this.checkIsTalking(stream);
         if (this.isMuted) {
           stream.getAudioTracks().forEach((track) => {
             track.enabled = false;
@@ -383,6 +456,26 @@ export class ChatTownComponent implements OnInit {
         call.answer(stream);
         call.on('stream', (remoteStream: MediaStream) => {
           this.isInCall = true;
+          //remove the hidden class of hang-up and mute
+          const hangUp = document.getElementById('hang-up');
+          const mute = document.getElementById('mute');
+          const icons = document.getElementById('icons');
+          hangUp?.classList.remove('hidden');
+          mute?.classList.remove('hidden');
+          icons?.classList.remove('hidden');
+          // add the hidden to call class
+          const callUser = document.getElementById('call-user');
+          callUser?.classList.add('hidden');
+          const micOn = document.getElementById('mic-on');
+          const micOff = document.getElementById('mic-off');
+          if (this.isMuted) {
+            micOn?.classList.add('hidden');
+            micOff?.classList.remove('hidden');
+          } else {
+            micOff?.classList.add('hidden');
+            micOn?.classList.remove('hidden');
+          }
+          console.log('is in call: ', this.isInCall);
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
           this.playRemoteStream(remoteStream);
@@ -390,6 +483,16 @@ export class ChatTownComponent implements OnInit {
         // Handle call close event
         call.on('close', () => {
           this.isInCall = false;
+          const hangUp = document.getElementById('hang-up');
+          const mute = document.getElementById('mute');
+          const icons = document.getElementById('icons');
+          hangUp?.classList.add('hidden');
+          mute?.classList.add('hidden');
+          icons?.classList.add('hidden');
+          // remove the hidden to call class
+          const callUser = document.getElementById('call-user');
+          callUser?.classList.remove('hidden');
+          console.log('is in call: ', this.isInCall);
           console.log(
             `Call with user ${call.peer} has been hung up by receiver.`
           );
@@ -413,6 +516,15 @@ export class ChatTownComponent implements OnInit {
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+    const micOn = document.getElementById('mic-on');
+    const micOff = document.getElementById('mic-off');
+    if (this.isMuted) {
+      micOn?.classList.add('hidden');
+      micOff?.classList.remove('hidden');
+    } else {
+      micOff?.classList.add('hidden');
+      micOn?.classList.remove('hidden');
+    }
 
     for (const key in this.currentCalls) {
       const call = this.currentCalls[key];
