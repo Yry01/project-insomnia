@@ -70,11 +70,6 @@ export class ChatTownComponent implements OnInit {
   }
 
   initGame() {
-    //add hidden class to hung-up and mute
-    const mute = document.getElementById('mute');
-    const hangUp = document.getElementById('hang-up');
-    mute?.classList.add('hidden');
-    hangUp?.classList.add('hidden');
     // initialize the game canvas
     this.app = new PIXI.Application({
       view: document.getElementById('game-canvas') as HTMLCanvasElement,
@@ -336,11 +331,22 @@ export class ChatTownComponent implements OnInit {
       console.log('call is: ', call);
       call.on('stream', (remoteStream: MediaStream) => {
         this.isInCall = true;
-        //remove the hidden class of hang-up and mute
+        //remove the hidden class of hang-up and mute and icons
         const hangUp = document.getElementById('hang-up');
         const mute = document.getElementById('mute');
+        const icons = document.getElementById('icons');
         hangUp?.classList.remove('hidden');
         mute?.classList.remove('hidden');
+        icons?.classList.remove('hidden');
+        const micOn = document.getElementById('mic-on');
+        const micOff = document.getElementById('mic-off');
+        if (this.isMuted) {
+          micOn?.classList.add('hidden');
+          micOff?.classList.remove('hidden');
+        } else {
+          micOff?.classList.add('hidden');
+          micOn?.classList.remove('hidden');
+        }
         // add the hidden to call class
         const callUser = document.getElementById('call-user');
         callUser?.classList.add('hidden');
@@ -354,8 +360,10 @@ export class ChatTownComponent implements OnInit {
         // add the hidden class of hang-up and mute
         const hangUp = document.getElementById('hang-up');
         const mute = document.getElementById('mute');
+        const icons = document.getElementById('icons');
         hangUp?.classList.add('hidden');
         mute?.classList.add('hidden');
+        icons?.classList.add('hidden');
         // remove the hidden to call class
         const callUser = document.getElementById('call-user');
         callUser?.classList.remove('hidden');
@@ -398,10 +406,17 @@ export class ChatTownComponent implements OnInit {
       // Set a threshold for when the user is considered to be talking
       const threshold = 10;
 
+      const vol = document.getElementById('vol');
       if (average > threshold) {
         this.isTalking = true;
+        if (!this.isMuted && this.isInCall) {
+          vol?.classList.remove('hidden');
+        } else {
+          vol?.classList.add('hidden');
+        }
       } else {
         this.isTalking = false;
+        vol?.classList.add('hidden');
       }
 
       // Check the audio levels every 100 milliseconds
@@ -444,11 +459,22 @@ export class ChatTownComponent implements OnInit {
           //remove the hidden class of hang-up and mute
           const hangUp = document.getElementById('hang-up');
           const mute = document.getElementById('mute');
+          const icons = document.getElementById('icons');
           hangUp?.classList.remove('hidden');
           mute?.classList.remove('hidden');
+          icons?.classList.remove('hidden');
           // add the hidden to call class
           const callUser = document.getElementById('call-user');
           callUser?.classList.add('hidden');
+          const micOn = document.getElementById('mic-on');
+          const micOff = document.getElementById('mic-off');
+          if (this.isMuted) {
+            micOn?.classList.add('hidden');
+            micOff?.classList.remove('hidden');
+          } else {
+            micOff?.classList.add('hidden');
+            micOn?.classList.remove('hidden');
+          }
           console.log('is in call: ', this.isInCall);
           // Handle the remote stream (e.g., play it in an audio element)
           console.log('audio should be playing in answerCall');
@@ -459,8 +485,10 @@ export class ChatTownComponent implements OnInit {
           this.isInCall = false;
           const hangUp = document.getElementById('hang-up');
           const mute = document.getElementById('mute');
+          const icons = document.getElementById('icons');
           hangUp?.classList.add('hidden');
           mute?.classList.add('hidden');
+          icons?.classList.add('hidden');
           // remove the hidden to call class
           const callUser = document.getElementById('call-user');
           callUser?.classList.remove('hidden');
@@ -488,6 +516,15 @@ export class ChatTownComponent implements OnInit {
 
   toggleMute() {
     this.isMuted = !this.isMuted;
+    const micOn = document.getElementById('mic-on');
+    const micOff = document.getElementById('mic-off');
+    if (this.isMuted) {
+      micOn?.classList.add('hidden');
+      micOff?.classList.remove('hidden');
+    } else {
+      micOff?.classList.add('hidden');
+      micOn?.classList.remove('hidden');
+    }
 
     for (const key in this.currentCalls) {
       const call = this.currentCalls[key];
