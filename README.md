@@ -33,9 +33,8 @@ Overall, our web application provides a unique and immersive way of connecting w
 1. socket io 2 points
 2. peerjs 2 points
 3. pixijs 2 points
-4. web audio 1 point
-5. sigin twillo 1 point
-6. google auth 1 point
+4. google auth 1 point
+Note: We talked to Cho and he said our group only need to do 7 complexity points.
 
 ### Alpha version
 
@@ -47,7 +46,7 @@ Overall, our web application provides a unique and immersive way of connecting w
 
 ### Beta version
 
-- Signin twillo and google auth
+- Google auth
   - Account and Signin, Signup, Signout, authorize
 - socket io
   - Allow differenct user and real time synchronize
