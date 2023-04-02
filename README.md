@@ -34,7 +34,8 @@ Overall, our web application provides a unique and immersive way of connecting w
 2. peerjs 2 points
 3. pixijs 2 points
 4. google auth 1 point
-   Note: We talked to Cho and he said our group only need to do 7 complexity points.
+
+Note: We talked to Cho and he said our group only need to do 7 complexity points.
 
 ### Alpha version
 
