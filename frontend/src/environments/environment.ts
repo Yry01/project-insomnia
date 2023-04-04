@@ -7,10 +7,10 @@ export const environment = {
   //   domain:,
   //   clientId:,
   //   authorizationParams: {
-  //     redirect_uri: window.location.origin,
+  //     redirect_uri:,
   //   },
   // },
   // peerjsPort:,
   // peerjsHost:,
-  // peerjsSecure: true,
+  peerjsSecure: true,
 };
