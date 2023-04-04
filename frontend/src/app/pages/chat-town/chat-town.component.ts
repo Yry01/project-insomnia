@@ -100,17 +100,17 @@ export class ChatTownComponent implements OnInit {
     this.app.stage.addChild(this.mapUpperContainer);
 
     // initialize the game map
-    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png'); // change
-    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png'); // change
+    const mapLower = PIXI.Sprite.from('../../assets/map/map-lower.png');
+    const mapUpper = PIXI.Sprite.from('../../assets/map/map-upper.png');
 
     // set the spawn point of the map
     this.mapLowerContainer.position.set(
       this.Utils.xOffSet() - this.Utils.withGrid(24),
-      this.Utils.yOffSet() - this.Utils.withGrid(22)
+      this.Utils.yOffSet() - this.Utils.withGrid(12)
     );
     this.mapUpperContainer.position.set(
       this.Utils.xOffSet() - this.Utils.withGrid(24),
-      this.Utils.yOffSet() - this.Utils.withGrid(22)
+      this.Utils.yOffSet() - this.Utils.withGrid(12)
     );
 
     this.mapLowerContainer.addChild(mapLower);
@@ -130,7 +130,7 @@ export class ChatTownComponent implements OnInit {
         skin: SKINS[Math.floor(Math.random() * 15)],
         direction: 'down',
         x: this.Utils.withGrid(24),
-        y: this.Utils.withGrid(22),
+        y: this.Utils.withGrid(12),
       });
 
       // render all online players
@@ -197,59 +197,15 @@ export class ChatTownComponent implements OnInit {
   renderMap() {
     // render map based on camera person's position
     const cameraPerson = this.allPlayers[this.playerId];
-    if (
-      cameraPerson.x > 232 &&
-      cameraPerson.x < 392 &&
-      cameraPerson.y > 136 &&
-      cameraPerson.y < 396
-    ) {
-      this.mapLowerContainer.position.set(
-        this.Utils.xOffSet() - cameraPerson.x,
-        this.Utils.yOffSet() - cameraPerson.y
-      );
-      this.mapUpperContainer.position.set(
-        this.Utils.xOffSet() - cameraPerson.x,
-        this.Utils.yOffSet() - cameraPerson.y
-      );
-    } else {
-      let xOffSet = this.Utils.xOffSet();
-      let yOffSet = this.Utils.yOffSet();
-      if (cameraPerson.x < 232) {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - 232;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      } else if (cameraPerson.x > 392) {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - 392;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      } else {
-        if (cameraPerson.y < 136) {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - 136;
-        } else if (cameraPerson.y > 396) {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - 396;
-        } else {
-          xOffSet = xOffSet - cameraPerson.x;
-          yOffSet = yOffSet - cameraPerson.y;
-        }
-      }
-      this.mapLowerContainer.position.set(xOffSet, yOffSet);
-      this.mapUpperContainer.position.set(xOffSet, yOffSet);
+
+    if (cameraPerson.x >= 232 && cameraPerson.x <= 388) {
+      this.mapLowerContainer.x = this.Utils.xOffSet() - cameraPerson.x;
+      this.mapUpperContainer.x = this.Utils.xOffSet() - cameraPerson.x;
+    }
+
+    if (cameraPerson.y >= 136 && cameraPerson.y <= 296) {
+      this.mapLowerContainer.y = this.Utils.yOffSet() - cameraPerson.y;
+      this.mapUpperContainer.y = this.Utils.yOffSet() - cameraPerson.y;
     }
   }
 
