@@ -1,15 +1,17 @@
+// uncomment the following lines and fill in your
+// own environment congiguration
 export const environment = {
   production: false,
-  backendUrl: 'http://localhost:3000',
-  auth: {
-    domain: 'dev-hpc5hctabd1e0xhl.us.auth0.com',
-    clientId: 'yTAS8N2p5Nog3fAxbQ5uuzbborxoSv3e',
-    authorizationParams: {
-      redirect_uri: window.location.origin,
-    },
-  },
+  // backendUrl:,
+  // auth: {
+  //   domain:,
+  //   clientId:,
+  //   authorizationParams: {
+  //     redirect_uri:,
+  //   },
+  // },
 
-  peerjsPort: 3000,
-  peerjsHost: 'localhost',
+  // peerjsPort:,
+  // peerjsHost:,
   peerjsSecure: false,
 };
