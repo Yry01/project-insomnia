@@ -76,86 +76,44 @@ export class Sprite {
   }
 
   update(state: any) {
-    //if camera person has distance from the wall less than 15, then the whole map should not move according to the player\
-    if (
-      state.cameraPerson.x === this.playerObject.x &&
-      state.cameraPerson.y === this.playerObject.y
-    ) {
-      let y = this.Utils.yOffSet();
-      let x = this.Utils.xOffSet();
-      if (state.cameraPerson.y > 396) {
-        y = this.playerObject.y + this.Utils.yOffSet() - 396;
-        if (state.cameraPerson.x > 392) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 232) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 232;
-        }
-      } else if (state.cameraPerson.y < 136) {
+    const cameraPerson = state.cameraPerson;
+
+    let x = this.playerObject.x + this.Utils.xOffSet() - cameraPerson.x;
+    let y = this.playerObject.y + this.Utils.yOffSet() - cameraPerson.y;
+
+    if (this.playerObject === cameraPerson) {
+      if (cameraPerson.x < 232) {
+        x = this.playerObject.x + this.Utils.xOffSet() - 232;
+      }
+      if (cameraPerson.x > 388) {
+        x = this.playerObject.x + this.Utils.xOffSet() - 388;
+      }
+      if (cameraPerson.y < 136) {
         y = this.playerObject.y + this.Utils.yOffSet() - 136;
-        if (state.cameraPerson.x > 392) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 232) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 232;
-        }
-      } else {
-        if (state.cameraPerson.x > 392) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 392;
-        } else if (state.cameraPerson.x < 232) {
-          x = this.playerObject.x + this.Utils.xOffSet() - 232;
-        }
       }
-      if (state.direction !== undefined) {
-        this.playAnimation(state.direction);
+      if (cameraPerson.y > 296) {
+        y = this.playerObject.y + this.Utils.yOffSet() - 296;
       }
-      this.playerSprite.zIndex = y;
-      this.playerSprite.position.set(x - 8, y - 16);
     } else {
-      let xcenter = state.cameraPerson.x;
-      let ycenter = state.cameraPerson.y;
-      if (
-        state.cameraPerson.x > 392 &&
-        state.cameraPerson.x < 232 &&
-        state.cameraPerson.y > 396 &&
-        state.cameraPerson.y < 136
-      ) {
-        const x = this.playerObject.x + this.Utils.xOffSet() - xcenter;
-        const y = this.playerObject.y + this.Utils.yOffSet() - ycenter;
-        if (state.direction !== undefined) {
-          this.playAnimation(state.direction);
-        }
-        this.playerSprite.zIndex = y;
-        this.playerSprite.position.set(x - 8, y - 16);
-      } else {
-        if (state.cameraPerson.y > 396) {
-          ycenter = 396;
-          if (state.cameraPerson.x > 392) {
-            xcenter = 392;
-          } else if (state.cameraPerson.x < 232) {
-            xcenter = 232;
-          }
-        } else if (state.cameraPerson.y < 136) {
-          ycenter = 136;
-          if (state.cameraPerson.x > 392) {
-            xcenter = 392;
-          } else if (state.cameraPerson.x < 232) {
-            xcenter = 232;
-          }
-        } else {
-          if (state.cameraPerson.x > 392) {
-            xcenter = 392;
-          } else if (state.cameraPerson.x < 232) {
-            xcenter = 232;
-          }
-        }
-        const x = this.playerObject.x + this.Utils.xOffSet() - xcenter;
-        const y = this.playerObject.y + this.Utils.yOffSet() - ycenter;
-        if (state.direction !== undefined) {
-          this.playAnimation(state.direction);
-        }
-        this.playerSprite.zIndex = y;
-        this.playerSprite.position.set(x - 8, y - 16);
+      if (cameraPerson.x < 232) {
+        x -= 232 - cameraPerson.x;
+      }
+      if (cameraPerson.x > 388) {
+        x += cameraPerson.x - 388;
+      }
+      if (cameraPerson.y < 136) {
+        y -= 136 - cameraPerson.y;
+      }
+      if (cameraPerson.y > 296) {
+        y += cameraPerson.y - 296;
       }
     }
+
+    if (state.direction !== undefined) {
+      this.playAnimation(state.direction);
+    }
+    this.playerSprite.zIndex = y;
+    this.playerSprite.position.set(x - 8, y - 16);
   }
 
   playAnimation(direction: string) {
