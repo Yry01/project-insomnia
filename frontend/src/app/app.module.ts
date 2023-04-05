@@ -10,9 +10,10 @@ import { FormsModule } from '@angular/forms';
 import { HttpClientModule } from '@angular/common/http';
 
 import { environment } from '../environments/environment';
+import { CreditComponent } from './pages/credit/credit.component';
 
 @NgModule({
-  declarations: [AppComponent, ChatTownComponent],
+  declarations: [AppComponent, ChatTownComponent, CreditComponent],
   imports: [
     BrowserModule,
     AppRoutingModule,
