@@ -22,11 +22,13 @@ https://youtu.be/v72StNEfVLg
 
 Our web application is a virtual space that allows people to gather and interact with each other in a fun and engaging way. Our application is designed to recreate the experience of being in a physical space, with different areas, objects, and activities to explore.
 
-The main feature of our application is a customizable map where users can join different rooms or areas. Users can move around the map and interact with other users and objects in real-time, using avatars or customized characters.
-
-To enhance the social aspect of the application, we offer various communication features, such as private messaging, friend lists, or group chats. Users can also earn rewards or achievements by completing tasks or participating in events, which can be displayed on their profile page.
+The main feature of our application is a customizable map where users can join different rooms or areas to make a voice call. Users can move around the map and interact with other users and objects in real time, using avatars or customized characters.
 
 Overall, our web application provides a unique and immersive way of connecting with people online, whether for entertainment, education, or collaboration. With its user-friendly interface, customizable features, and social capabilities, it offers a versatile and engaging platform for any kind of virtual gathering.
+
+## How to use our app
+
+You need to log in to our application by using your email or Google account. Press W A S D to move and press G to make a call. You can only make a call when there are other users in the chat-town. After you make a call, you can press M to mute or H to hang on.
 
 ## Complexity points picked
 
