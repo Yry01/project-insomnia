@@ -37,7 +37,7 @@ You need to log in to our application by using your email or Google account. Pre
 3. pixijs 2 points
 4. google auth 1 point
 
-Note: We talked to Cho and he said our group only need to do 7 complexity points.
+Note: We talked to Cho and he said our group only need to do 7 complexity points, because there are no other complexity points fit our project.
 
 ### Alpha version
 
