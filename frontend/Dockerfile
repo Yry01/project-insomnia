@@ -8,3 +8,5 @@ RUN npm run build
 # Stage 2: Create the production image
 FROM nginx:alpine
 COPY --from=builder /app/dist/frontend /usr/share/nginx/html
+
+COPY nginx-custom.conf /etc/nginx/nginx.conf

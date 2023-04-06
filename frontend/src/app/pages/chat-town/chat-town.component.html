@@ -42,8 +42,15 @@
   </div>
 
   <ng-template #loggedOut>
-    <button class="button-62" role="button" (click)="auth.loginWithRedirect()">
+    <button
+      class="button-62"
+      role="button-right"
+      (click)="auth.loginWithRedirect()"
+    >
       Log in
+    </button>
+    <button class="button-62 button-right" role="button" routerLink="/credit">
+      Credits
     </button>
   </ng-template>
 </header>
