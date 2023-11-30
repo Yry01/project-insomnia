@@ -10,9 +10,7 @@ Runyu Yue：1007391298
 
 Xu Zheng: 1006330132
 
-## Website
 
-https://cscc09.insonmiachat.one/
 
 ## Project video
 
