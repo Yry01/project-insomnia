@@ -28,14 +28,13 @@ Overall, our web application provides a unique and immersive way of connecting w
 
 You need to log in to our application by using your email or Google account. Press W A S D to move and press G to make a call. You can only make a call when there are other users in the chat-town. After you make a call, you can press M to mute or H to hang on.
 
-## Complexity points picked
+## Libraries used
 
-1. socket io 2 points
-2. peerjs 2 points
-3. pixijs 2 points
-4. google auth 1 point
+1. socket io
+2. peerjs
+3. pixijs
+4. google auth
 
-Note: We talked to Cho and he said our group only need to do 7 complexity points, because there are no other complexity points fit our project.
 
 ### Alpha version
 
